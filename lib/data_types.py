@@ -71,7 +71,7 @@ class AuthData:
         errors = {}
         for param in inspect.signature(cls).parameters:
             if param not in json_msg:
-                errors[param] = f'missing parameter "{param}"'
+                errors[param] = "missing parameter"
         if errors:
             raise JsonDataException(errors)
         return cls(
