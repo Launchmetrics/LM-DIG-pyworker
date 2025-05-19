@@ -23,7 +23,7 @@ class InputParameters:
         errors = {}
         for param in inspect.signature(cls).parameters:
             if param not in json_msg:
-                errors[param] = "missing parameter"
+                errors[param] = f'missing parameter: "{param}"'
         if errors:
             raise JsonDataException(errors)
         return cls(
@@ -43,7 +43,8 @@ class InputData(ApiPayload):
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "InputData":
         return cls(
-            inputs=data["inputs"], parameters=InputParameters(**data["parameters"])
+            inputs=data["inputs"],
+            parameters=InputParameters(**data["parameters"])
         )
 
     @classmethod
@@ -62,7 +63,7 @@ class InputData(ApiPayload):
         errors = {}
         for param in inspect.signature(cls).parameters:
             if param not in json_msg:
-                errors[param] = "missing parameter"
+                errors[param] = f'missing parameter: "{param}"'
         if errors:
             raise JsonDataException(errors)
         try:
