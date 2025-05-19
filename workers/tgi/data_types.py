@@ -4,12 +4,8 @@ import inspect
 from typing import Dict, Any
 
 from transformers import AutoTokenizer
-import nltk
 
 from lib.data_types import ApiPayload, JsonDataException
-
-nltk.download("words")
-WORD_LIST = nltk.corpus.words.words()
 
 tokenizer = AutoTokenizer.from_pretrained("openai-community/openai-gpt")
 
@@ -49,8 +45,17 @@ class InputData(ApiPayload):
 
     @classmethod
     def for_test(cls) -> "InputData":
-        prompt = " ".join(random.choices(WORD_LIST, k=int(250)))
-        return cls(messages=prompt, parameters=InputParameters())
+        messages = [
+            {
+                "role": "system",
+                "content": "You are a helpful assistant."
+            },
+            {
+                "role": "user",
+                "content": "What is deep learning?"
+            }
+        ]
+        return cls(messages=messages, parameters=InputParameters())
 
     def generate_payload_json(self) -> Dict[str, Any]:
         return dataclasses.asdict(self)
