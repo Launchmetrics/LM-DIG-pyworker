@@ -45,6 +45,7 @@ class ChatHandler(EndpointHandler[InputData]):
     async def generate_client_response(
         self, client_request: web.Request, model_response: ClientResponse
     ) -> Union[web.Response, web.StreamResponse]:
+        log.debug(f'{client_request}')
         _ = client_request
         match model_response.status:
             case 200:
