@@ -56,70 +56,11 @@ class ChatHandler(EndpointHandler[InputData]):
                 return web.Response(status=code)
 
 
-@dataclasses.dataclass
-class GenerateHandler(EndpointHandler[InputData]):
-
-    @property
-    def endpoint(self) -> str:
-        return "/generate"
-
-    @classmethod
-    def payload_cls(cls) -> Type[InputData]:
-        return InputData
-
-    def make_benchmark_payload(self) -> InputData:
-        return InputData.for_test()
-
-    async def generate_client_response(
-        self, client_request: web.Request, model_response: ClientResponse
-    ) -> Union[web.Response, web.StreamResponse]:
-        _ = client_request
-        match model_response.status:
-            case 200:
-                log.debug("SUCCESS")
-                data = await model_response.json()
-                return web.json_response(data=data)
-            case code:
-                log.debug("SENDING RESPONSE: ERROR: unknown code")
-                return web.Response(status=code)
-
-
-class GenerateStreamHandler(EndpointHandler[InputData]):
-    @property
-    def endpoint(self) -> str:
-        return "/generate_stream"
-
-    @classmethod
-    def payload_cls(cls) -> Type[InputData]:
-        return InputData
-
-    def make_benchmark_payload(self) -> InputData:
-        return InputData.for_test()
-
-    async def generate_client_response(
-        self, client_request: web.Request, model_response: ClientResponse
-    ) -> Union[web.Response, web.StreamResponse]:
-        match model_response.status:
-            case 200:
-                log.debug("Streaming response...")
-                res = web.StreamResponse()
-                res.content_type = "text/event-stream"
-                await res.prepare(client_request)
-                async for chunk in model_response.content:
-                    await res.write(chunk)
-                await res.write_eof()
-                log.debug("Done streaming response")
-                return res
-            case code:
-                log.debug("SENDING RESPONSE: ERROR: unknown code")
-                return web.Response(status=code)
-
-
 backend = Backend(
     model_server_url=MODEL_SERVER_URL,
     model_log_file=os.environ["MODEL_LOG"],
     allow_parallel_requests=True,
-    benchmark_handler=GenerateHandler(benchmark_runs=3, benchmark_words=256),
+    benchmark_handler=ChatHandler(benchmark_runs=3, benchmark_words=256),
     log_actions=[
         (LogAction.ModelLoaded, MODEL_SERVER_START_LOG_MSG),
         (LogAction.Info, '"message":"Download'),
@@ -134,11 +75,8 @@ backend = Backend(
 async def handle_ping(_):
     return web.Response(body="pong")
 
-
 routes = [
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
-    web.post("/generate", backend.create_handler(GenerateHandler())),
-    web.post("/generate_stream", backend.create_handler(GenerateStreamHandler())),
     web.get("/ping", handle_ping),
 ]
 
