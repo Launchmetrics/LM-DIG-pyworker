@@ -37,20 +37,20 @@ class InputParameters:
 
 @dataclasses.dataclass
 class InputData(ApiPayload):
-    inputs: str
+    messages: list
     parameters: InputParameters
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "InputData":
         return cls(
-            inputs=data["inputs"],
+            messages=data["messages"],
             parameters=InputParameters(**data["parameters"])
         )
 
     @classmethod
     def for_test(cls) -> "InputData":
         prompt = " ".join(random.choices(WORD_LIST, k=int(250)))
-        return cls(inputs=prompt, parameters=InputParameters())
+        return cls(messages=prompt, parameters=InputParameters())
 
     def generate_payload_json(self) -> Dict[str, Any]:
         return dataclasses.asdict(self)
@@ -68,7 +68,7 @@ class InputData(ApiPayload):
             raise JsonDataException(errors)
         try:
             parameters = InputParameters.from_json_msg(json_msg["parameters"])
-            return cls(inputs=json_msg["inputs"], parameters=parameters)
+            return cls(messages=json_msg["messages"], parameters=parameters)
         except JsonDataException as e:
             errors["parameters"] = e.message
             raise JsonDataException(errors)
