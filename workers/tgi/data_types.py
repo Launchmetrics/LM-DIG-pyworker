@@ -38,10 +38,7 @@ class InputParameters:
         )
     
     def __repr__(self):
-        return {
-            att: val
-            for att, val in self.__dict__.items()
-        }
+        return str(self.__dict__.items())
 
 
 @dataclasses.dataclass
