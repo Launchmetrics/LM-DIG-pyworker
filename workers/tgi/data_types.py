@@ -70,7 +70,7 @@ class InputData(ApiPayload):
         return dataclasses.asdict(self)
 
     def count_workload(self) -> int:
-        return self.parameters.temperature
+        return self.parameters.max_tokens
 
     @classmethod
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputData":
