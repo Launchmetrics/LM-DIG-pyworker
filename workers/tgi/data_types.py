@@ -28,6 +28,7 @@ class InputParameters:
 @dataclasses.dataclass
 class InputData(ApiPayload):
     messages: list
+    max_tokens: int = 16
     parameters: InputParameters
 
     @classmethod
