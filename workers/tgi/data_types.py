@@ -28,8 +28,8 @@ class InputParameters:
 @dataclasses.dataclass
 class InputData(ApiPayload):
     messages: list
-    max_tokens: int = 16
     parameters: InputParameters
+    max_tokens: int = 16
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "InputData":
