@@ -6,7 +6,7 @@ from lib.data_types import ApiPayload, JsonDataException
 
 @dataclasses.dataclass
 class InputParameters:
-    max_tokens: int = 256
+    temperature: float = .01
 
     @classmethod
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
@@ -55,7 +55,7 @@ class InputData(ApiPayload):
         return dataclasses.asdict(self)
 
     def count_workload(self) -> int:
-        return self.parameters.max_tokens
+        return self.parameters.temperature
 
     @classmethod
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputData":
