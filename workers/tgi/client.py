@@ -27,7 +27,10 @@ def call_generate(endpoint_group_name: str, api_key: str, server_url: str) -> No
         reqnum=message["reqnum"],
         url=message["url"],
     )
-    payload = dict(inputs="tell me about cats", parameters=dict(max_new_tokens=500))
+    payload = dict(
+        inputs="tell me about cats",
+        parameters=dict(max_tokens=500)
+    )
     req_data = dict(payload=payload, auth_data=auth_data)
     url = urljoin(url, WORKER_ENDPOINT)
     print(f"url: {url}")
@@ -62,7 +65,10 @@ def call_generate_stream(endpoint_group_name: str, api_key: str, server_url: str
         reqnum=message["reqnum"],
         url=message["url"],
     )
-    payload = dict(inputs="tell me about dogs", parameters=dict(max_new_tokens=500))
+    payload = dict(
+        inputs="tell me about dogs",
+        parameters=dict(max_tokens=500)
+    )
     req_data = dict(payload=payload, auth_data=auth_data)
     url = urljoin(url, WORKER_ENDPOINT)
     response = requests.post(url, json=req_data, stream=True)
