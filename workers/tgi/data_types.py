@@ -1,13 +1,7 @@
 import dataclasses
-import random
 import inspect
 from typing import Dict, Any
-
-from transformers import AutoTokenizer
-
 from lib.data_types import ApiPayload, JsonDataException
-
-tokenizer = AutoTokenizer.from_pretrained("openai-community/openai-gpt")
 
 
 @dataclasses.dataclass
