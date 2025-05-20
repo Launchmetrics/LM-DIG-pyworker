@@ -7,6 +7,7 @@ from lib.data_types import ApiPayload, JsonDataException
 @dataclasses.dataclass
 class InputParameters:
     temperature: float = .01
+    max_tokens: int = 16
 
     @classmethod
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
@@ -35,7 +36,8 @@ class InputData(ApiPayload):
     def from_dict(cls, data: Dict[str, Any]) -> "InputData":
         return cls(
             messages=data["messages"],
-            parameters=InputParameters(**data["parameters"])
+            parameters=InputParameters(**data["parameters"]),
+            max_tokens=data["parameters"].get('max_tokens') or cls.max_tokens
         )
 
     @classmethod
@@ -50,7 +52,11 @@ class InputData(ApiPayload):
                 "content": "What is deep learning?"
             }
         ]
-        return cls(messages=messages, parameters=InputParameters())
+        return cls(
+            messages=messages,
+            parameters=InputParameters(),
+            max_tokens=256
+        )
 
     def generate_payload_json(self) -> Dict[str, Any]:
         return dataclasses.asdict(self)
@@ -68,7 +74,11 @@ class InputData(ApiPayload):
             raise JsonDataException(errors)
         try:
             parameters = InputParameters.from_json_msg(json_msg["parameters"])
-            return cls(messages=json_msg["messages"], parameters=parameters)
+            return cls(
+                messages=json_msg["messages"],
+                parameters=parameters,
+                max_tokens=parameters.max_tokens
+            )
         except JsonDataException as e:
             errors["parameters"] = e.message
             raise JsonDataException(errors)
