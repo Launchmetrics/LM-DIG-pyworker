@@ -32,13 +32,13 @@ class InputData(ApiPayload):
     parameters: InputParameters
     max_tokens: int = 16
 
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "InputData":
-        return cls(
-            messages=data["messages"],
-            parameters=InputParameters(**data["parameters"]),
-            max_tokens=data["parameters"].get('max_tokens') or cls.max_tokens
-        )
+    #@classmethod
+    #def from_dict(cls, data: Dict[str, Any]) -> "InputData":
+    #    return cls(
+    #        messages=data["messages"],
+    #        parameters=InputParameters(**data["parameters"]),
+    #        max_tokens=data["parameters"].get('max_tokens') or cls.max_tokens
+    #    )
 
     @classmethod
     def for_test(cls) -> "InputData":
