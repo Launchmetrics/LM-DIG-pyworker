@@ -1,13 +1,13 @@
 import dataclasses
 import inspect
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from lib.data_types import ApiPayload, JsonDataException
 
 
 @dataclasses.dataclass
 class InputParameters:
-    temperature: float = .01
-    max_tokens: int = 16
+    temperature: Optional[float]
+    max_tokens: Optional[int]
 
     @classmethod
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
@@ -31,14 +31,6 @@ class InputData(ApiPayload):
     messages: list
     parameters: InputParameters
     max_tokens: int = 16
-
-    #@classmethod
-    #def from_dict(cls, data: Dict[str, Any]) -> "InputData":
-    #    return cls(
-    #        messages=data["messages"],
-    #        parameters=InputParameters(**data["parameters"]),
-    #        max_tokens=data["parameters"].get('max_tokens') or cls.max_tokens
-    #    )
 
     @classmethod
     def for_test(cls) -> "InputData":
