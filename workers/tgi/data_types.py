@@ -4,43 +4,26 @@ from typing import Dict, Any, Optional
 from lib.data_types import ApiPayload, JsonDataException
 
 
-#@dataclasses.dataclass
-#class InputParameters:
-#    temperature: Optional[float]
-#    max_tokens: Optional[int]
-
-#    @classmethod
-#    def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
-#        errors = {}
-#        for param in inspect.signature(cls).parameters:
-#            if param not in json_msg:
-#                errors[param] = f"missing parameter (InputParameters): '{param}'"
-#        if errors:
-#            raise JsonDataException(errors)
-#        return cls(
-#            **{
-#                k: v
-#                for k, v in json_msg.items()
-#                if k in inspect.signature(cls).parameters
-#            }
-#        )
-
-class InputParameters:    
-    def __init__(self, **params):
-        for key, val in params.items():
-            setattr(self, key, val)
+@dataclasses.dataclass
+class InputParameters:
+    temperature: Optional[float] = None
+    max_tokens: Optional[int] = None
 
     @classmethod
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
-        return cls(**json_msg)
-    
-    def __repr__(self):
-        attr = {key: f'"{val}"' if type(val) is str else val  for key, val in self.__dict__.items()}
-
-        return '{}({})'.format(
-			self.__class__.__name__,
-			', '.join([f"{att}={val}" for att, val in attr.items()])
-		)
+        errors = {}
+        #for param in inspect.signature(cls).parameters:
+        #    if param not in json_msg:
+        #        errors[param] = f"missing parameter (InputParameters): '{param}'"
+        #if errors:
+        #    raise JsonDataException(errors)
+        return cls(
+            **{
+                k: v
+                for k, v in json_msg.items()
+                if k in inspect.signature(cls).parameters
+            }
+        )
 
 
 @dataclasses.dataclass
