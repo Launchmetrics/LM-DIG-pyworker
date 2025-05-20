@@ -38,12 +38,7 @@ class InputParameters:
         )
     
     def __repr__(self):
-        return str(
-            {
-                k: v
-                for k, v in self.__dict__.items()
-            }
-        )
+        return str({'max_tokens': 256})
 
 
 @dataclasses.dataclass
