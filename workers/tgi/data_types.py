@@ -64,7 +64,7 @@ class InputData(ApiPayload):
         ]
         return cls(
             messages=messages,
-            parameters=InputParameters(),
+            parameters=InputParameters(max_tokens=256),
             max_tokens=256
         )
 
