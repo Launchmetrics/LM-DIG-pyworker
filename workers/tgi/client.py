@@ -29,7 +29,7 @@ def call_generate(endpoint_group_name: str, api_key: str, server_url: str) -> No
     )
     payload = dict(
         inputs="tell me about cats",
-        parameters=dict(max_tokens=500)
+        parameters=dict(temperature=.01)
     )
     req_data = dict(payload=payload, auth_data=auth_data)
     url = urljoin(url, WORKER_ENDPOINT)
@@ -67,7 +67,7 @@ def call_generate_stream(endpoint_group_name: str, api_key: str, server_url: str
     )
     payload = dict(
         inputs="tell me about dogs",
-        parameters=dict(max_tokens=500)
+        parameters=dict(temperature=.01)
     )
     req_data = dict(payload=payload, auth_data=auth_data)
     url = urljoin(url, WORKER_ENDPOINT)
