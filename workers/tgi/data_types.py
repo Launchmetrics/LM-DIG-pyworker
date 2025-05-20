@@ -6,8 +6,8 @@ from lib.data_types import ApiPayload, JsonDataException
 
 @dataclasses.dataclass
 class InputParameters:
-    temperature: Optional[float] = None
-    max_tokens: Optional[int] = None
+    temperature: Optional[float] = .01
+    max_tokens: Optional[int] = 128
 
     @classmethod
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
