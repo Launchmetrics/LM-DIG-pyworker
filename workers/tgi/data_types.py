@@ -4,41 +4,41 @@ from typing import Dict, Any, Optional
 from lib.data_types import ApiPayload, JsonDataException
 
 
-#@dataclasses.dataclass
-#class InputParameters:
-#    temperature: Optional[float] = .01
-#    max_tokens: Optional[int] = 128
+@dataclasses.dataclass
+class InputParameters:
+    temperature: Optional[float] = .01
+    max_tokens: Optional[int] = 128
 
-#    @classmethod
-#    def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
-#        errors = {}
+    @classmethod
+    def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
+        errors = {}
         #for param in inspect.signature(cls).parameters:
         #    if param not in json_msg:
         #        errors[param] = f"missing parameter (InputParameters): '{param}'"
         #if errors:
         #    raise JsonDataException(errors)
-#        return cls(
-#            **{
-#                k: v
-#                for k, v in json_msg.items()
-#                if k in inspect.signature(cls).parameters
-#            }
-#        )
-
-class InputParameters:
-
-    def __init__(self, **params):
-        for k, v in params.items():
-            setattr(self, k, v)
-
-    @classmethod
-    def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
         return cls(
-            **json_msg
+            **{
+                k: v
+                for k, v in json_msg.items()
+                if k in inspect.signature(cls).parameters
+            }
         )
+
+#class InputParameters:
+
+#    def __init__(self, **params):
+#        for k, v in params.items():
+#            setattr(self, k, v)
+
+#    @classmethod
+#    def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
+#        return cls(
+#            **json_msg
+#        )
     
-    def __repr__(self):
-        return str({'max_tokens': 256})
+#    def __repr__(self):
+#        return str({'max_tokens': 256})
 
 
 @dataclasses.dataclass
