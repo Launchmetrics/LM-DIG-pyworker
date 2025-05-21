@@ -2,22 +2,28 @@ import dataclasses
 import inspect
 from typing import Dict, Any, Optional
 from lib.data_types import ApiPayload, JsonDataException
-import json
+
+
+def no_default_str(cls):  # Decorator for class.
+    def __str__(self):
+        """Returns a string containing only the non-default field values."""
+        s = ', '.join(f'{field.name}={getattr(self, field.name)}'
+                      for field in dataclasses.fields(self)
+                      if getattr(self, field.name) != field.default)
+        return f'{type(self).__name__}({s})'
+
+    setattr(cls, '__str__', __str__)
+    return cls
 
 
 @dataclasses.dataclass
+@no_default_str
 class InputParameters:
     temperature: Optional[float] = None
     max_tokens: Optional[int] = 128
 
     @classmethod
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
-        errors = {}
-        #for param in inspect.signature(cls).parameters:
-        #    if param not in json_msg:
-        #        errors[param] = f"missing parameter (InputParameters): '{param}'"
-        #if errors:
-        #    raise JsonDataException(errors)
         return cls(
             **{
                 k: v
@@ -26,20 +32,27 @@ class InputParameters:
             }
         )
 
-#class InputParameters:
 
-#    def __init__(self, **params):
-#        for k, v in params.items():
-#            setattr(self, k, v)
+# @dataclasses.dataclass
+# class InputParameters:
+#    temperature: Optional[float] = None
+#    max_tokens: Optional[int] = 128
 
 #    @classmethod
 #    def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
+        # errors = {}
+        # for param in inspect.signature(cls).parameters:
+        #    if param not in json_msg:
+        #        errors[param] = f"missing parameter (InputParameters): '{param}'"
+        # if errors:
+        #    raise JsonDataException(errors)
 #        return cls(
-#            **json_msg
+#            **{
+#                k: v
+#                for k, v in json_msg.items()
+#                if k in inspect.signature(cls).parameters
+#            }
 #        )
-    
-#    def __repr__(self):
-#        return json.dumps({'max_tokens': 256})
 
 
 @dataclasses.dataclass
