@@ -74,7 +74,7 @@ class InputParameters:
 @dataclasses.dataclass
 class InputData(ApiPayload):
     messages: list
-    max_tokens: Optional[int] = None
+    max_tokens: int
 
     @classmethod
     def for_test(cls) -> "InputData":
@@ -97,7 +97,7 @@ class InputData(ApiPayload):
         return dataclasses.asdict(self)
 
     def count_workload(self) -> int:
-        return self.parameters.max_tokens
+        return self.max_tokens
 
     @classmethod
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputData":
