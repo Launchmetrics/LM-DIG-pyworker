@@ -75,6 +75,7 @@ class InputParameters:
 class InputData(ApiPayload):
     messages: list
     parameters: InputParameters
+    max_tokens: Optional[int] = None
 
     @classmethod
     def for_test(cls) -> "InputData":
