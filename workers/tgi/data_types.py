@@ -19,8 +19,24 @@ def no_default_str(cls):  # Decorator for class.
 @dataclasses.dataclass
 @no_default_str
 class InputParameters:
+    """
+    Supports almost all params from /v1/chat/completions
+    - https://huggingface.github.io/text-generation-inference/#/Text%20Generation%20Inference/chat_completions
+    """
     temperature: Optional[float] = None
-    max_tokens: Optional[int] = 128
+    max_tokens: Optional[int] = None
+    logprobs: Optional[bool] = None
+    frequency_penalty: Optional[float] = None
+    model: Optional[str] = None
+    presence_penalty: Optional[float] = None
+    response_format: Optional[str] = None
+    seed: Optional[int] = None
+    stream: Optional[bool] = None
+    stream_options: Optional[Any] = None
+    top_logprobs: Optional[int] = None
+    top_p: Optional[float] = None
+    do_sample: Optional[bool] = None
+    num_beams: Optional[int] = None
 
     @classmethod
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputParameters":
