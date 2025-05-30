@@ -111,7 +111,7 @@ class InputData(ApiPayload):
             parameters = InputParameters.from_json_msg(json_msg["parameters"])
             return cls(
                 messages=json_msg["messages"],
-                parameters=parameters
+                max_tokens=parameters.max_tokens
             )
         except JsonDataException as e:
             errors["parameters"] = e.message
