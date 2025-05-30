@@ -50,9 +50,11 @@ class InputParameters:
 
 
 @dataclasses.dataclass
+@no_default_str
 class InputData(ApiPayload):
     messages: list
     max_tokens: int
+    temperature: Optional[float] = None
 
     @classmethod
     def for_test(cls) -> "InputData":
@@ -80,16 +82,13 @@ class InputData(ApiPayload):
     @classmethod
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputData":
         errors = {}
-        for param in inspect.signature(cls).parameters:
-            if param not in json_msg:
-                errors[param] = f"missing parameter (InputData): '{param}'"
+        for field in dataclasses.fields(cls):
+            if json_msg.get(field.name) == field.default is not None:
+                errors[field.name] = f"missing parameter (InputData): '{field.name}'"
         if errors:
             raise JsonDataException(errors)
         try:
-            return cls(
-                messages=json_msg["messages"],
-                max_tokens=json_msg["max_tokens"]
-            )
+            return cls(**json_msg)
         except JsonDataException as e:
             errors["parameters"] = e.message
             raise JsonDataException(errors)
