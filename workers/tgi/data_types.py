@@ -56,6 +56,18 @@ class InputData(ApiPayload):
     max_tokens: int
     temperature: Optional[float] = None
     num_beams: Optional[int] = None
+    do_sample: Optional[bool] = None
+
+    # logprobs: Optional[bool] = None
+    # frequency_penalty: Optional[float] = None
+    # model: Optional[str] = None
+    # presence_penalty: Optional[float] = None
+    # response_format: Optional[str] = None
+    # seed: Optional[int] = None
+    # stream: Optional[bool] = None
+    # stream_options: Optional[Any] = None
+    # top_logprobs: Optional[int] = None
+    # top_p: Optional[float] = None
 
     @classmethod
     def for_test(cls) -> "InputData":
