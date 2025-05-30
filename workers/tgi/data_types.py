@@ -75,7 +75,6 @@ class InputParameters:
 class InputData(ApiPayload):
     messages: list
     parameters: InputParameters
-    max_tokens: int = 16
 
     @classmethod
     def for_test(cls) -> "InputData":
@@ -92,7 +91,6 @@ class InputData(ApiPayload):
         return cls(
             messages=messages,
             parameters=InputParameters(max_tokens=256),
-            max_tokens=256
         )
 
     def generate_payload_json(self) -> Dict[str, Any]:
@@ -113,8 +111,7 @@ class InputData(ApiPayload):
             parameters = InputParameters.from_json_msg(json_msg["parameters"])
             return cls(
                 messages=json_msg["messages"],
-                parameters=parameters,
-                max_tokens=parameters.max_tokens
+                parameters=parameters
             )
         except JsonDataException as e:
             errors["parameters"] = e.message
