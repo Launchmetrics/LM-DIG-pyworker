@@ -90,7 +90,7 @@ class InputData(ApiPayload):
         ]
         return cls(
             messages=messages,
-            parameters=InputParameters(max_tokens=256),
+            max_tokens=256,
         )
 
     def generate_payload_json(self) -> Dict[str, Any]:
