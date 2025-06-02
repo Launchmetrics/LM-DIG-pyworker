@@ -63,7 +63,7 @@ class InputData(ApiPayload):
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputData":
         errors = {}
         for field in dataclasses.fields(cls):
-            if json_msg.get(field.name) == field.default is not None:
+            if field.default is not None and json_msg.get(field.name) is None:
                 errors[field.name] = f"missing parameter (InputData): '{field.name}'"
         if errors:
             raise JsonDataException(errors)
