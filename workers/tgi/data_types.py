@@ -20,12 +20,12 @@ def no_default_str(cls):  # Decorator for class.
 @no_default_str
 class InputData(ApiPayload):
     messages: list
+    max_tokens: int
     repetition_penalty: Optional[float] = None
     frequency_penalty: Optional[float] = None
     logit_bias: Optional[list[float]] = None
     logprobs: Optional[bool] = None
     top_logprobs: Optional[int] = None
-    max_tokens: int
     n: Optional[int] = None
     presence_penalty: Optional[float] = None
     stream: bool = False
