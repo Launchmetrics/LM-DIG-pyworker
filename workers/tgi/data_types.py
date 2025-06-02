@@ -20,21 +20,71 @@ def no_default_str(cls):  # Decorator for class.
 @no_default_str
 class InputData(ApiPayload):
     messages: list
+    repetition_penalty: Optional[float] = None
+    frequency_penalty: Optional[float] = None
+    logit_bias: Optional[list[float]] = None
+    logprobs: Optional[bool] = None
+    top_logprobs: Optional[int] = None
     max_tokens: int
-    temperature: Optional[float] = None
-    num_beams: Optional[int] = None
-    do_sample: Optional[bool] = None
+    n: Optional[int] = None
+    presence_penalty: Optional[float] = None
+    stream: bool = False
     seed: Optional[int] = None
+    temperature: Optional[float] = None
     top_p: Optional[float] = None
+    tools: Optional[list] = None
+    tool_prompt: Optional[str] = None
+    tool_choice: Optional[str] = None
+    stop: Optional[list[str]] = None
 
-    # logprobs: Optional[bool] = None
-    # frequency_penalty: Optional[float] = None
-    # model: Optional[str] = None
-    # presence_penalty: Optional[float] = None
-    # response_format: Optional[str] = None
-    # stream: Optional[bool] = None
-    # stream_options: Optional[Any] = None
-    # top_logprobs: Optional[int] = None
+    """
+        Given a list of messages, generate a response.
+        - https://github.com/huggingface/text-generation-inference/blob/main/clients/python/text_generation/client.py
+        Check ChatRequest:
+        - https://github.com/huggingface/text-generation-inference/blob/main/clients/python/text_generation/types.py
+
+        Args:
+            messages (`List`):
+                List of messages (dict) in the conversation
+            repetition_penalty (`float`):
+                The parameter for repetition penalty. 0.0 means no penalty. See [this
+                paper](https://arxiv.org/pdf/1909.05858.pdf) for more details.
+            frequency_penalty (`float`):
+                The parameter for frequency penalty. 0.0 means no penalty
+                Penalize new tokens based on their existing frequency in the text so far,
+                decreasing the model's likelihood to repeat the same line verbatim.
+            logit_bias (`List[float]`):
+                Adjust the likelihood of specified tokens
+            logprobs (`bool`):
+                Include log probabilities in the response
+            top_logprobs (`int`):
+                Include the `n` most likely tokens at each step
+            max_tokens (`int`):
+                Maximum number of generated tokens
+            n (`int`):
+                Generate `n` completions
+            presence_penalty (`float`):
+                The parameter for presence penalty. 0.0 means no penalty. See [this
+                paper](https://arxiv.org/pdf/1909.05858.pdf) for more details.
+            stream (`bool`):
+                Stream the response
+            seed (`int`):
+                Random sampling seed
+            temperature (`float`):
+                The value used to module the logits distribution.
+            top_p (`float`):
+                If set to < 1, only the smallest set of most probable tokens with probabilities that add up to `top_p` or
+                higher are kept for generation
+            tools (`List[Tool]`):
+                List of tools to use
+            tool_prompt (`str`):
+                A prompt to be appended before the tools
+            tool_choice (`str`):
+                The tool to use
+            stop (`List[str]`):
+                Stop generating tokens if a member of `stop` is generated
+
+    """
 
     @classmethod
     def for_test(cls) -> "InputData":
