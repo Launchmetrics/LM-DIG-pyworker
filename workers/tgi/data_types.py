@@ -21,6 +21,7 @@ def no_default_str(cls):  # Decorator for class.
 class InputData(ApiPayload):
     messages: list
     max_tokens: int
+    stream: bool = False
     repetition_penalty: Optional[float] = None
     frequency_penalty: Optional[float] = None
     logit_bias: Optional[list[float]] = None
@@ -28,7 +29,6 @@ class InputData(ApiPayload):
     top_logprobs: Optional[int] = None
     n: Optional[int] = None
     presence_penalty: Optional[float] = None
-    stream: bool = False
     seed: Optional[int] = None
     temperature: Optional[float] = None
     top_p: Optional[float] = None
@@ -113,7 +113,7 @@ class InputData(ApiPayload):
     def from_json_msg(cls, json_msg: Dict[str, Any]) -> "InputData":
         errors = {}
         for field in dataclasses.fields(cls):
-            if field.default is not None and json_msg.get(field.name) is None:
+            if type(field.default) == dataclasses._MISSING_TYPE and json_msg.get(field.name) is None:
                 errors[field.name] = f"missing parameter (InputData): '{field.name}'"
         if errors:
             raise JsonDataException(errors)
