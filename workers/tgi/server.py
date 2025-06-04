@@ -73,7 +73,7 @@ backend = Backend(
 
 
 async def handle_ping(_):
-    return web.Response(body="pong")
+    return web.Response(body=str(backend.metrics))
 
 routes = [
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
