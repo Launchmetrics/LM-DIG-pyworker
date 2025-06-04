@@ -73,7 +73,33 @@ backend = Backend(
 
 
 async def handle_ping(_):
-    return web.Response(body=str(backend.metrics.asdict()))
+    """
+    Return same metrics sent to autoscaler server
+    According to lib.metrics.__send_metrics_and_reset compute_autoscaler_data
+    """
+    #return AutoScalaerData(
+    #            id=self.id,
+    #            loadtime=(self.system_metrics.model_loading_time or 0.0),
+    #            cur_load=(self.model_metrics.workload_processing / elapsed),
+    #            max_perf=self.model_metrics.max_throughput,
+    #            cur_perf=self.model_metrics.cur_perf,
+    #            error_msg=self.model_metrics.error_msg or "",
+    #            num_requests_working=len(self.model_metrics.requests_working),
+    #            num_requests_recieved=len(self.model_metrics.requests_recieved),
+    #            additional_disk_usage=self.system_metrics.additional_disk_usage,
+    #            cur_capacity=0,
+    #            max_capacity=0,
+    #            url=self.url,
+    #        )
+
+
+    
+    res = {
+        'id': backend.metrics.id,
+        'url': backend.metrics.url,
+    }
+    return web.json_response(res)
+    # return web.Response(body=str(backend.metrics))
 
 routes = [
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
