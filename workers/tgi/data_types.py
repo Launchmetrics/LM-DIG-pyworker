@@ -2,6 +2,7 @@ import dataclasses
 import inspect
 from typing import Dict, Any, Optional
 from lib.data_types import ApiPayload, JsonDataException
+from tasks.brand import bench_messages
 
 
 def no_default_str(cls):  # Decorator for class.
@@ -88,19 +89,9 @@ class InputData(ApiPayload):
 
     @classmethod
     def for_test(cls) -> "InputData":
-        messages = [
-            {
-                "role": "system",
-                "content": "You are a helpful assistant."
-            },
-            {
-                "role": "user",
-                "content": "What is deep learning?"
-            }
-        ]
         return cls(
-            messages=messages,
-            max_tokens=256,
+            messages=bench_messages,
+            max_tokens=2,
         )
 
     def generate_payload_json(self) -> Dict[str, Any]:
