@@ -14,10 +14,18 @@ from .data_types import InputData
 MODEL_SERVER_URL = "http://0.0.0.0:5001"
 
 # This is the last log line that gets emitted once comfyui+extensions have been fully loaded
-MODEL_SERVER_START_LOG_MSG = '"message":"Connected","target":"text_generation_router::server"'
+MODEL_SERVER_START_LOG_MSG = [
+    '"message":"Connected","target":"text_generation_router"',
+    '"message":"Connected","target":"text_generation_router::server"',
+]
 MODEL_SERVER_ERROR_LOG_MSGS = [
-    'Error: ShardFailed', '"message":"shard terminated"', '"message":"Terminating webserver"',
-    '"message":"Shutting down shards"'
+    'Error: ShardFailed',
+    '"message":"shard terminated"',
+    '"message":"Terminating webserver"',
+    '"message":"Shutting down shards"',
+    'Error: WebserverFailed',
+    'Error: DownloadError',
+    'Error: ShardCannotStart',
 ]
 
 
