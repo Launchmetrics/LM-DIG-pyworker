@@ -340,12 +340,9 @@ class Backend:
                                 max_throughput=max_throughput,
                             )
                         except ClientConnectorError as e:
-                            log.debug('*' * 50)
-                            log.debug(str(e))
                             log.debug(
                                 f"failed to connect to comfyui api during benchmark"
                             )
-                            log.debug('*' * 50)
                             self.backend_errored(str(e))
                     case LogAction.ModelError if msg in log_line:
                         log.debug(f"Got log line indicating error: {log_line}")
