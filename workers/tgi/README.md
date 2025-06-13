@@ -9,11 +9,11 @@ Both endpoints use the following API payload format:
 {
   "inputs": "PROMPT",
   "parameters": {
-    "max_new_tokens": 250
+    "max_tokens": 250
   }
 }
 ```
 
-Note that the max_new_tokens parameter, rather than the prompt size, impacts performance. For example, if an
-instance is benchmarked to process 100 tokens per second, a request with max_new_tokens = 200 will take
+Note that the max_tokens parameter, rather than the prompt size, impacts performance. For example, if an
+instance is benchmarked to process 100 tokens per second, a request with max_tokens = 200 will take
 approximately 2 seconds to complete.
