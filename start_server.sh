@@ -8,6 +8,7 @@ SERVER_DIR="$WORKSPACE_DIR/vast-pyworker"
 ENV_PATH="$WORKSPACE_DIR/worker-env"
 DEBUG_LOG="$WORKSPACE_DIR/debug.log"
 PYWORKER_LOG="$WORKSPACE_DIR/pyworker.log"
+PYWORKER_BRANCH="${PYWORKER_BRANCH:-main}"
 
 REPORT_ADDR="${REPORT_ADDR:-https://run.vast.ai}"
 USE_SSL="${USE_SSL:-true}"
@@ -40,6 +41,7 @@ echo_var SERVER_DIR
 echo_var ENV_PATH
 echo_var DEBUG_LOG
 echo_var PYWORKER_LOG
+echo_var PYWORKER_BRANCH
 echo_var MODEL_LOG
 
 env | grep _ >> /etc/environment;
@@ -49,7 +51,7 @@ if [ ! -d "$ENV_PATH" ]
 then
     apt install -y python3.10-venv
     echo "setting up venv"
-    git clone https://github.com/Launchmetrics/LM-DIG-pyworker "$SERVER_DIR"
+    git clone --branch "$PYWORKER_BRANCH" https://github.com/Launchmetrics/LM-DIG-pyworker "$SERVER_DIR"
 
     python3 -m venv "$WORKSPACE_DIR/worker-env"
     source "$WORKSPACE_DIR/worker-env/bin/activate"
