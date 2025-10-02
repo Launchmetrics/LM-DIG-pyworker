@@ -8,6 +8,7 @@ SERVER_DIR="$WORKSPACE_DIR/vast-pyworker"
 ENV_PATH="$WORKSPACE_DIR/worker-env"
 DEBUG_LOG="$WORKSPACE_DIR/debug.log"
 PYWORKER_LOG="$WORKSPACE_DIR/pyworker.log"
+PYWORKER_BRANCH="${PYWORKER_BRANCH:-main}"
 
 REPORT_ADDR="${REPORT_ADDR:-https://cloud.vast.ai/api/v0,https://run.vast.ai}"
 USE_SSL="${USE_SSL:-true}"
@@ -39,6 +40,7 @@ echo_var SERVER_DIR
 echo_var ENV_PATH
 echo_var DEBUG_LOG
 echo_var PYWORKER_LOG
+echo_var PYWORKER_BRANCH
 echo_var MODEL_LOG
 
 # Populate /etc/environment with quoted values
@@ -59,10 +61,7 @@ then
     fi
 
     # Fork testing
-    [[ ! -d $SERVER_DIR ]] && git clone "${PYWORKER_REPO:-https://github.com/vast-ai/pyworker}" "$SERVER_DIR"
-    if [[ -n ${PYWORKER_REF:-} ]]; then
-        (cd "$SERVER_DIR" && git checkout "$PYWORKER_REF")
-    fi
+    [[ ! -d $SERVER_DIR ]] && git clone --branch "$PYWORKER_BRANCH" https://github.com/Launchmetrics/LM-DIG-pyworker "$SERVER_DIR"
 
     uv venv --python-preference only-managed "$ENV_PATH" -p 3.10
     source "$ENV_PATH/bin/activate"
