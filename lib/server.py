@@ -25,7 +25,7 @@ def start_server(backend: Backend, routes: List[web.RouteDef], **kwargs):
 
     async def main():
         log.debug("starting server...")
-        app = web.Application()
+        app = web.Application(client_max_size=8192**2)  # to support batch mode
         app.add_routes(routes)
         runner = web.AppRunner(app)
         await runner.setup()
