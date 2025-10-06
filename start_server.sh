@@ -23,7 +23,7 @@ exec &> >(tee -a "$DEBUG_LOG")
 if ! ldconfig -p | grep 'libcuda.so ' #no space after .so
 then
 	echo 'libcuda.so not found'
-        ld_cuda_txt=$(ldconfig -p | grep libcuda.so.1 ) #search libcuda.so.1
+    ld_cuda_txt=$(ldconfig -p | grep libcuda.so.1 ) #search libcuda.so.1
 	matched=$(echo $ld_cuda_txt | grep -o '/.\+.so.') #get path
 	matched=${matched::-1} # remove '1'
 	echo "=> $matched"
