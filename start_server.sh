@@ -19,6 +19,23 @@ cd "$WORKSPACE_DIR"
 # make all output go to $DEBUG_LOG and stdout without having to add `... | tee -a $DEBUG_LOG` to every command
 exec &> >(tee -a "$DEBUG_LOG")
 
+# ldconfig libcuda check
+if ! ldconfig -p | grep 'libcuda.so ' #no space after .so
+then
+	echo 'libcuda.so not found'
+        ld_cuda_txt=$(ldconfig -p | grep libcuda.so.1 ) #search libcuda.so.1
+	matched=$(echo $ld_cuda_txt | grep -o '/.\+.so.') #get path
+	matched=${matched::-1} # remove '1'
+	echo "=> $matched"
+	cuda_lib=$(ls ${matched}.*.*)
+	echo "=> $cuda_lib"
+	ln -s $cuda_lib $matched
+    ldconfig
+else
+	echo 'libcuda.so is found'
+fi
+# libcuda.so is now supposed to be linked
+
 function echo_var(){
     echo "$1: ${!1}"
 }
