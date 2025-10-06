@@ -20,17 +20,15 @@ cd "$WORKSPACE_DIR"
 exec &> >(tee -a "$DEBUG_LOG")
 
 # ldconfig libcuda check
-if ! ldconfig -p | grep 'libcuda.so ' #no space after .so
+if ! ldconfig -p | grep 'libcuda.so ' #please note space after .so
 then
 	echo 'libcuda.so not found'
-    ld_cuda_txt=$(ldconfig -p | grep libcuda.so.1 ) #search libcuda.so.1
-	matched=$(echo $ld_cuda_txt | grep -o '/.\+.so.') #get path
-	matched=${matched::-1} # remove '1'
-	echo "=> $matched"
-	cuda_lib=$(ls ${matched}.*.*)
+	link=$(ldconfig -p | grep libcuda.so | grep -o '/.\+\.so')
+	echo "=> $link" #/lib/x86_64-linux-gnu/libcuda.so
+	cuda_lib=$(ls ${link}.*.*) #/lib/x86_64-linux-gnu/libcuda.so.550.76
 	echo "=> $cuda_lib"
-	ln -s $cuda_lib $matched
-    ldconfig
+	ln -s $cuda_lib $link
+	ldconfig
 else
 	echo 'libcuda.so is found'
 fi
