@@ -110,20 +110,7 @@ async def handle_ping(_):
     Return same metrics sent to autoscaler server
     According to lib.metrics.__send_metrics_and_reset compute_autoscaler_data
     """
-
-    res = {
-        'id': backend.metrics.id,
-        'loadtime': (backend.metrics.system_metrics.model_loading_time or 0.0),
-        'max_perf': backend.metrics.model_metrics.max_throughput,
-        'cur_perf': backend.metrics.model_metrics.cur_perf,
-        'error_msg': backend.metrics.model_metrics.error_msg or "",
-        'num_requests_working': len(backend.metrics.model_metrics.requests_working),
-        'num_requests_recieved': len(backend.metrics.model_metrics.requests_recieved),
-        'additional_disk_usage': backend.metrics.system_metrics.additional_disk_usage,
-        'url': backend.metrics.url,
-    }
-    return web.json_response(res)
-    # return web.Response(body=str(backend.metrics))
+    return web.json_response(backend.metrics.last_metrics)
 
 routes = [
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
