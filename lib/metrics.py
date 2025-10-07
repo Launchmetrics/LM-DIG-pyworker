@@ -121,6 +121,7 @@ class Metrics:
             data = compute_autoscaler_data()
             if not len(report_addr):
                 # not need to post worker status
+                log.debug(f"no autoscaler: data not sent to vast.ai")
                 return True
             full_path = report_addr.rstrip("/") + "/worker_status/"
             log.debug(
