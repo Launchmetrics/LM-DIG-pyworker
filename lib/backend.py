@@ -232,7 +232,6 @@ class Backend:
                         log.debug(f"Healthcheck Endpoint not ready: {response.status}")
             except Exception as e:
                 log.debug(f"Healthcheck failed with exception: {e}")
-                log.debug(f"Healthcheck response: {response}")
                 self.backend_errored(str(e))
 
     async def _start_tracking(self) -> None:
