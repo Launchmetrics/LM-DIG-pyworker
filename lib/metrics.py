@@ -114,7 +114,7 @@ class Metrics:
                 max_capacity=0,
                 url=self.url,
             )
-            seld.last_metrics = asdict(autoscaler_data)
+            self.last_metrics = asdict(autoscaler_data)
             return autoscaler_data
 
         def send_data(report_addr: str) -> bool:
