@@ -46,7 +46,7 @@ class ChatHandler(EndpointHandler[InputData]):
 
     @property
     def healthcheck_endpoint(self) -> str:
-        return f"{MODEL_SERVER_URL}/health"
+        return "/health"
 
     @classmethod
     def payload_cls(cls) -> Type[InputData]:
