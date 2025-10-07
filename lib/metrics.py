@@ -35,6 +35,7 @@ class Metrics:
     url: str = field(default_factory=get_url)
     system_metrics: SystemMetrics = field(default_factory=SystemMetrics.empty)
     model_metrics: ModelMetrics = field(default_factory=ModelMetrics.empty)
+    last_metrics: dict = field(default_factory = lambda: {}) # cache last metrics for ping pull
 
     def _request_start(self, workload: float, reqnum: int) -> None:
         """
@@ -99,7 +100,7 @@ class Metrics:
     def __send_metrics_and_reset(self, elapsed):
 
         def compute_autoscaler_data() -> AutoScalaerData:
-            return AutoScalaerData(
+            autoscaler_data = AutoScalaerData(
                 id=self.id,
                 loadtime=(self.system_metrics.model_loading_time or 0.0),
                 cur_load=(self.model_metrics.workload_processing / elapsed),
@@ -113,9 +114,14 @@ class Metrics:
                 max_capacity=0,
                 url=self.url,
             )
+            seld.last_metrics = asdict(autoscaler_data)
+            return autoscaler_data
 
         def send_data(report_addr: str) -> bool:
             data = compute_autoscaler_data()
+            if not len(report_addr):
+                # not need to post worker status
+                return True
             full_path = report_addr.rstrip("/") + "/worker_status/"
             log.debug(
                 "\n".join(
