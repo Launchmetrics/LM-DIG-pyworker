@@ -20,6 +20,7 @@ cd "$WORKSPACE_DIR"
 exec &> >(tee -a "$DEBUG_LOG")
 
 # ldconfig libcuda check
+ldconfig # create links and update cache
 if ! ldconfig -p | grep 'libcuda.so ' #please note space after .so
 then
 	echo 'libcuda.so not found'
