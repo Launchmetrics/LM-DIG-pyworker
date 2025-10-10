@@ -122,12 +122,12 @@ class Backend:
         """use this function to forward requests to the model endpoint"""
         try:
             data = await request.json()
-            auth_data, payload = handler.get_data_from_request(data)
+            auth_data, batch = handler.get_data_from_request(data)
         except JsonDataException as e:
             return web.json_response(data=e.message, status=422)
         except json.JSONDecodeError:
             return web.json_response(dict(error="invalid JSON"), status=422)
-        workload = payload.count_workload()
+        workload = sum([payload.count_workload() for payload in batch])
 
         async def cancel_api_call_if_disconnected() -> web.Response:
             await request.wait_for_disconnection()
