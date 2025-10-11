@@ -173,20 +173,18 @@ class Backend:
                     return_when=ALL_COMPLETED,
                 )
                 #######################
-                self.metrics._request_end(
-                    workload=workload,
-                    req_response_time=time.time() - start_time,
-                    reqnum=auth_data.reqnum,
-                )
                 results = [res.result() for res in done]
+                self.metrics._request_success(workload=workload)
                 return results
             except requests.exceptions.RequestException as e:
                 log.debug(f"[backend] Request error: {e}")
-                self.metrics._request_errored(
-                    workload=workload, reqnum=auth_data.reqnum
-                )
+                self.metrics._request_errored(workload=workload)
                 return web.Response(status=500)
             finally:
+                self.metrics._request_end(
+                    workload=workload,
+                    reqnum=auth_data.reqnum,
+                )
                 self.sem.release()
 
         ###########
