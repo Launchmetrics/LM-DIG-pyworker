@@ -200,7 +200,11 @@ class Backend:
                 return_when=FIRST_COMPLETED,
             )
             [task.cancel() for task in pending]
-            return done.pop().result()
+            
+            results = [task.result() for task in done]
+            result = results.pop()
+            return web.json_response([res for res in result])
+            
         except Exception as e:
             log.debug(f"Exception in main handler loop {e}")
             return web.Response(status=500)
