@@ -162,7 +162,6 @@ class Backend:
             else:
                 log.debug(f"Starting request for reqnum:{auth_data.reqnum}")
             try:
-                start_time = time.time()
                 ##############################
                 done, _ = await wait(
                     [
