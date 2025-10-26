@@ -110,14 +110,25 @@ async def handle_ping(_):
     Return same metrics sent to autoscaler server
     According to lib.metrics.__send_metrics_and_reset compute_autoscaler_data
     """
-    tgi_metrics = {'q_size': 24}
+    session = backend.session
+    tgi_url = f'{MODEL_SERVER_URL}/metrics'  # TGI metrics
+    metrics = ['tgi_queue_size']  # params to parse
+    tgi_metrics = {}
+
+    async with session.get(tgi_url, timeout=5) as resp:
+        if resp.status == 200:
+            raw_resp = await resp.text()
+            for line in raw_resp.split('\n'):
+                for metric in metrics:
+                    if line.startswith(metric):
+                        tgi_metrics[metric] = int(line[len(metric):].strip())
+
     return web.json_response(
         {
             **backend.metrics.last_metrics,
             **tgi_metrics
         }
     )
-    #return web.json_response(backend.metrics.last_metrics)
 
 routes = [
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
