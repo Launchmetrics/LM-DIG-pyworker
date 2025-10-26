@@ -111,7 +111,7 @@ async def handle_ping(_):
     According to lib.metrics.__send_metrics_and_reset compute_autoscaler_data
     """
     session = backend.session
-    tgi_url = f'{MODEL_SERVER_URL}/metrics'  # TGI metrics
+    tgi_url = '/metrics'  # TGI metrics
     metrics = ['tgi_queue_size']  # params to parse
     tgi_metrics = {}
 
