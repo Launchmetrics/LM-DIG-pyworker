@@ -120,11 +120,6 @@ class Metrics:
 
         def send_data(report_addr: str) -> bool:
             data = compute_autoscaler_data()
-            if not len(report_addr):
-                # not need to post worker status
-                log.debug(f"no autoscaler: data not sent to vast.ai")
-                return True
-            full_path = report_addr.rstrip("/") + "/worker_status/"
             log.debug(
                 "\n".join(
                     [
@@ -135,6 +130,11 @@ class Metrics:
                     ]
                 )
             )
+            if not len(report_addr):
+                # not need to post worker status
+                log.debug(f"no autoscaler: data not sent to vast.ai")
+                return True
+            full_path = report_addr.rstrip("/") + "/worker_status/"
             for attempt in range(1, 4):
                 try:
                     res = requests.post(full_path, json=asdict(data), timeout=1)
