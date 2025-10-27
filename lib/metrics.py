@@ -115,6 +115,7 @@ class Metrics:
                 url=self.url,
             )
             self.last_metrics = asdict(autoscaler_data)
+            self.last_metrics['workload_pending'] = self.model_metrics.workload_pending
             return autoscaler_data
 
         def send_data(report_addr: str) -> bool:
