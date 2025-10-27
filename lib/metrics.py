@@ -107,6 +107,7 @@ class Metrics:
                 max_perf=self.model_metrics.max_throughput,
                 cur_perf=self.model_metrics.cur_perf,
                 error_msg=self.model_metrics.error_msg or "",
+                workload_pending=self.model_metrics.workload_pending,
                 num_requests_working=len(self.model_metrics.requests_working),
                 num_requests_recieved=len(self.model_metrics.requests_recieved),
                 additional_disk_usage=self.system_metrics.additional_disk_usage,
@@ -115,7 +116,6 @@ class Metrics:
                 url=self.url,
             )
             self.last_metrics = asdict(autoscaler_data)
-            self.last_metrics['workload_pending'] = self.model_metrics.workload_pending
             return autoscaler_data
 
         def send_data(report_addr: str) -> bool:
