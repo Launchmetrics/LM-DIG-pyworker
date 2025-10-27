@@ -257,6 +257,7 @@ class AutoScalaerData:
     cur_perf: float
     cur_capacity: float
     max_capacity: float
+    workload_pending: float
     num_requests_working: int
     num_requests_recieved: int
     additional_disk_usage: float
