@@ -231,9 +231,10 @@ class Backend:
                 t.cancel()
             await asyncio.gather(*pending, return_exceptions=True)
 
-            done_task = done.pop()
+            results = [task.result() for task in done]
+            result = results.pop()
             try:
-                return done_task.result()
+                return web.json_response([res for res in result])
             except Exception as e:
                 log.debug(f"Request task raised exception: {e}")
                 return web.Response(status=500)
