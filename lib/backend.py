@@ -161,7 +161,6 @@ class Backend:
             
         async def make_requests() -> Union[web.Response, web.StreamResponse]:
             log.debug(f"got batch of {len(batch)} requests, {auth_data.reqnum}")
-            self.metrics._request_start(workload=workload, reqnum=auth_data.reqnum)
             if self.allow_parallel_requests is False:
                 log.debug(f"Waiting to aquire Sem for reqnum:{auth_data.reqnum}")
                 await self.sem.acquire()
@@ -182,11 +181,7 @@ class Backend:
                     return_when=ALL_COMPLETED,
                 )
                 #######################
-                self.metrics._request_end(
-                    workload=workload,
-                    req_response_time=time.time() - start_time,
-                    reqnum=auth_data.reqnum,
-                )
+                self.metrics._request_success(request_metrics)
                 results = [res.result() for res in done]
                 return results
             except requests.exceptions.RequestException as e:
