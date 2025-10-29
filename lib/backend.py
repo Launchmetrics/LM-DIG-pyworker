@@ -186,9 +186,7 @@ class Backend:
                 return results
             except requests.exceptions.RequestException as e:
                 log.debug(f"[backend] Request error: {e}")
-                self.metrics._request_errored(
-                    workload=workload, reqnum=auth_data.reqnum
-                )
+                self.metrics._request_errored(request_metrics)
                 return web.Response(status=500)
             finally:
                 self.sem.release()
