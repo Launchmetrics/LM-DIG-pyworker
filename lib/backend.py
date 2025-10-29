@@ -5,7 +5,7 @@ import base64
 import subprocess
 import dataclasses
 import logging
-from asyncio import wait, sleep, gather, Semaphore, FIRST_COMPLETED, create_task
+from asyncio import wait, sleep, gather, Semaphore, FIRST_COMPLETED, ALL_COMPLETED, create_task
 from typing import Tuple, Awaitable, NoReturn, List, Union, Callable, Optional
 from functools import cached_property
 from distutils.util import strtobool
