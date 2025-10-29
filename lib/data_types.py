@@ -258,6 +258,7 @@ class ModelMetrics:
     def wait_time(self) -> float:
         if (len(self.requests_working) == 0):
             return 0.0
+        return 0.0 # we cannot rely on the formula below
         return sum([request.workload for request in self.requests_working.values()]) / max(self.max_throughput, 0.00001)
     
     @property
