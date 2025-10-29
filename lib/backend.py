@@ -161,14 +161,6 @@ class Backend:
             
         async def make_requests() -> Union[web.Response, web.StreamResponse]:
             log.debug(f"got batch of {len(batch)} requests, {auth_data.reqnum}")
-            if self.allow_parallel_requests is False:
-                log.debug(f"Waiting to aquire Sem for reqnum:{auth_data.reqnum}")
-                await self.sem.acquire()
-                log.debug(
-                    f"Sem acquired for reqnum:{auth_data.reqnum}, starting request..."
-                )
-            else:
-                log.debug(f"Starting request for reqnum:{auth_data.reqnum}")
             try:
                 start_time = time.time()                
                 ##############################
@@ -188,8 +180,6 @@ class Backend:
                 log.debug(f"[backend] Request error: {e}")
                 self.metrics._request_errored(request_metrics)
                 return web.Response(status=500)
-            finally:
-                self.sem.release()
 
         ###########
 
