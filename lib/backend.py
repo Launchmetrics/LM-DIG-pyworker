@@ -58,7 +58,7 @@ class Backend:
         EndpointHandler  # this endpoint handler will be used for benchmarking
     )
     log_actions: List[Tuple[LogAction, str]]
-    max_wait_time: float = 10.0
+    max_wait_time: float = 50 * 10.0 # we handle batches of max 50 req
     reqnum = -1
     version = VERSION
     msg_history = []
