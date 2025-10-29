@@ -130,12 +130,12 @@ class Backend:
         """use this function to forward requests to the model endpoint"""
         try:
             data = await request.json()
-            auth_data, payload = handler.get_data_from_request(data)
+            auth_data, batch = handler.get_data_from_request(data)
         except JsonDataException as e:
             return web.json_response(data=e.message, status=422)
         except json.JSONDecodeError:
             return web.json_response(dict(error="invalid JSON"), status=422)
-        workload = payload.count_workload()
+        workload = sum([payload.count_workload() for payload in batch])
         request_metrics: RequestMetrics = RequestMetrics(request_idx=auth_data.request_idx, reqnum=auth_data.reqnum, workload=workload, status="Created")
 
         async def cancel_api_call_if_disconnected() -> web.Response:
@@ -144,25 +144,59 @@ class Backend:
             self.metrics._request_canceled(request_metrics)
             raise asyncio.CancelledError
 
-        async def make_request() -> Union[web.Response, web.StreamResponse]:
-            try:
-                response = await self.__call_api(handler=handler, payload=payload)
-                status_code = response.status
-                log.debug(
-                    " ".join(
-                        [
-                            f"request with reqnum:{request_metrics.reqnum}",
-                            f"returned status code: {status_code},",
-                        ]
-                    )
+        async def make_request(payload):
+            response = await self.__call_api(handler=handler, payload=payload)
+            status_code = response.status
+            log.debug(
+                 " ".join(
+                    [
+                        f"request with reqnum:{auth_data.reqnum}",
+                        f"returned status code: {status_code},",
+                    ]
                 )
-                res = await handler.generate_client_response(request, response)
-                self.metrics._request_success(request_metrics)
-                return res
+            )
+            res = await handler.generate_response(request, response)
+            res['req_id'] = payload.req_id # add req_id into response
+            return res
+            
+        async def make_requests() -> Union[web.Response, web.StreamResponse]:
+            log.debug(f"got batch of {len(batch)} requests, {auth_data.reqnum}")
+            self.metrics._request_start(workload=workload, reqnum=auth_data.reqnum)
+            if self.allow_parallel_requests is False:
+                log.debug(f"Waiting to aquire Sem for reqnum:{auth_data.reqnum}")
+                await self.sem.acquire()
+                log.debug(
+                    f"Sem acquired for reqnum:{auth_data.reqnum}, starting request..."
+                )
+            else:
+                log.debug(f"Starting request for reqnum:{auth_data.reqnum}")
+            try:
+                start_time = time.time()                
+                ##############################
+                done, _ = await wait(
+                    [
+                        create_task(
+                            make_request(payload=payload)
+                        ) for payload in batch
+                    ],
+                    return_when=ALL_COMPLETED,
+                )
+                #######################
+                self.metrics._request_end(
+                    workload=workload,
+                    req_response_time=time.time() - start_time,
+                    reqnum=auth_data.reqnum,
+                )
+                results = [res.result() for res in done]
+                return results
             except requests.exceptions.RequestException as e:
                 log.debug(f"[backend] Request error: {e}")
-                self.metrics._request_errored(request_metrics)
+                self.metrics._request_errored(
+                    workload=workload, reqnum=auth_data.reqnum
+                )
                 return web.Response(status=500)
+            finally:
+                self.sem.release()
 
         ###########
 
