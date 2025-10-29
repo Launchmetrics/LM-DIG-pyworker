@@ -222,7 +222,7 @@ class Backend:
                 log.debug(f"Starting request for reqnum:{request_metrics.reqnum}")
             done, pending = await wait(
                 [
-                    create_task(make_request()),
+                    create_task(make_requests()),
                     create_task(cancel_api_call_if_disconnected()),
                 ],
                 return_when=FIRST_COMPLETED,
