@@ -112,6 +112,16 @@ class Metrics:
                 max_capacity=0,
                 url=self.url,
             )
+            log.debug(
+                "\n".join(
+                    [
+                        "#" * 60,
+                        f"sending data to autoscaler",
+                        f"{json.dumps((asdict(autoscaler_data)), indent=2)}",
+                        "#" * 60,
+                    ]
+                )
+            )
             self.last_metrics = asdict(autoscaler_data)
             return autoscaler_data
 
