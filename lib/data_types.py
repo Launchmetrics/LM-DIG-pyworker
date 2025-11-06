@@ -249,7 +249,7 @@ class ModelMetrics:
 class AutoScalaerData:
     """Data that is reported to autoscaler"""
 
-    id: int
+    id: str
     loadtime: float
     cur_load: float
     error_msg: str
