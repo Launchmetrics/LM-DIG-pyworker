@@ -10,7 +10,6 @@ DEBUG_LOG="$WORKSPACE_DIR/debug.log"
 PYWORKER_LOG="$WORKSPACE_DIR/pyworker.log"
 PYWORKER_BRANCH="${PYWORKER_BRANCH:-main}"
 
-REPORT_ADDR="${REPORT_ADDR:-https://cloud.vast.ai/api/v0,https://run.vast.ai}"
 USE_SSL="${USE_SSL:-true}"
 WORKER_PORT="${WORKER_PORT:-3000}"
 mkdir -p "$WORKSPACE_DIR"
@@ -49,7 +48,6 @@ echo "start_server.sh"
 date
 
 echo_var BACKEND
-echo_var REPORT_ADDR
 echo_var WORKER_PORT
 echo_var WORKSPACE_DIR
 echo_var SERVER_DIR
@@ -133,7 +131,7 @@ fi
 
 
 
-export REPORT_ADDR WORKER_PORT USE_SSL UNSECURED
+export WORKER_PORT USE_SSL UNSECURED
 
 cd "$SERVER_DIR"
 
