@@ -24,7 +24,7 @@ def get_url() -> str:
     return f"http{'s' if use_ssl else ''}://{public_ip}:{worker_port}"
 
 @cache
-def get_id() => str:
+def get_id() -> str:
     if 'CONTAINER_ID' in os.environ.keys():
         return os.environ['CONTAINER_ID']
     return os.environ['NF_POD_ID']
