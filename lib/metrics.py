@@ -25,9 +25,9 @@ def get_url() -> str:
 
 @cache
 def get_id() -> str:
-    if 'CONTAINER_ID' in os.environ.keys():
-        return os.environ['CONTAINER_ID']
-    return os.environ['NF_POD_ID']
+    if 'NF_POD_ID' in os.environ.keys():
+        return os.environ['NF_POD_ID']
+    return os.environ['CONTAINER_ID']
 
 @dataclass
 class Metrics:
