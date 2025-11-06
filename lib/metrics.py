@@ -29,9 +29,6 @@ class Metrics:
     last_metric_update: float = 0.0
     update_pending: bool = False
     id: int = field(default_factory=lambda: int(os.environ["CONTAINER_ID"]))
-    report_addr: List[str] = field(
-        default_factory=lambda: os.environ["REPORT_ADDR"].split(",")
-    )
     url: str = field(default_factory=get_url)
     system_metrics: SystemMetrics = field(default_factory=SystemMetrics.empty)
     model_metrics: ModelMetrics = field(default_factory=ModelMetrics.empty)
@@ -118,45 +115,11 @@ class Metrics:
             self.last_metrics = asdict(autoscaler_data)
             return autoscaler_data
 
-        def send_data(report_addr: str) -> bool:
-            data = compute_autoscaler_data()
-            log.debug(
-                "\n".join(
-                    [
-                        "#" * 60,
-                        f"sending data to autoscaler",
-                        f"{json.dumps((asdict(data)), indent=2)}",
-                        "#" * 60,
-                    ]
-                )
-            )
-            if not len(report_addr):
-                # not need to post worker status
-                log.debug(f"no autoscaler: data not sent to vast.ai")
-                return True
-            full_path = report_addr.rstrip("/") + "/worker_status/"
-            for attempt in range(1, 4):
-                try:
-                    res = requests.post(full_path, json=asdict(data), timeout=1)
-                    res.raise_for_status()
-                    return True
-                except requests.Timeout:
-                    log.debug(f"autoscaler status update timed out")
-                except Exception as e:
-                    log.debug(f"autoscaler status update failed with error: {e}")
-                time.sleep(2)
-                log.debug(f"retrying autoscaler status update, attempt: {attempt}")
-            log.debug(f"failed to send update through {report_addr}")
-            return False
-
         ###########
 
         self.system_metrics.update_disk_usage()
+        compute_autoscaler_data() # update self.last_metrics
 
-        for report_addr in self.report_addr:
-            success = send_data(report_addr)
-            if success is True:
-                break
         self.update_pending = False
         self.model_metrics.reset()
         self.system_metrics.reset()
