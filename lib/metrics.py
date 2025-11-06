@@ -23,12 +23,17 @@ def get_url() -> str:
     public_ip = os.environ["PUBLIC_IPADDR"]
     return f"http{'s' if use_ssl else ''}://{public_ip}:{worker_port}"
 
+@cache
+def get_id() => str:
+    if 'CONTAINER_ID' in os.environ.keys():
+        return os.environ['CONTAINER_ID']
+    return os.environ['NF_POD_ID']
 
 @dataclass
 class Metrics:
     last_metric_update: float = 0.0
     update_pending: bool = False
-    id: int = field(default_factory=lambda: int(os.environ["CONTAINER_ID"]))
+    id: str = field(default_factory=get_id)
     url: str = field(default_factory=get_url)
     system_metrics: SystemMetrics = field(default_factory=SystemMetrics.empty)
     model_metrics: ModelMetrics = field(default_factory=ModelMetrics.empty)
