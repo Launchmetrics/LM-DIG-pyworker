@@ -112,9 +112,21 @@ async def handle_ping(_):
     """
     return web.json_response(backend.metrics.last_metrics)
 
+async def handle_health(_):
+    """
+    Use metrics to compile server health status
+    """
+    last_metrics = backend.metrics.last_metrics
+    if len(last_metrics['health_status']['error_msg']) > 0:
+        return web.json_response(backend.metrics.last_metrics, status=503)
+    if int(last_metrics['health_status']['max_perf'] == 0):
+        return web.json_response(backend.metrics.last_metrics, status=503)
+    return web.json_response(backend.metrics.last_metrics)
+
 routes = [
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
     web.get("/ping", handle_ping),
+    web.get("/health", handle_health),
 ]
 
 if __name__ == "__main__":
