@@ -112,21 +112,29 @@ async def handle_ping(_):
     """
     return web.json_response(backend.metrics.last_metrics)
 
-async def handle_health(_):
+async def handle_health_error(_):
     """
-    Use metrics to compile server health status
+    Use metrics to return a 503 in case of error_msg
     """
     last_metrics = backend.metrics.last_metrics
     if len(last_metrics['health_status']['error_msg']) > 0:
-        return web.json_response(backend.metrics.last_metrics, status=503)
+        return web.json_response(last_metrics, status=503)
+    return web.json_response(last_metrics)
+
+async def handle_health_ready(_):
+    """
+    Use metrics to return a 503 while server is not ready
+    """
+    last_metrics = backend.metrics.last_metrics
     if int(last_metrics['health_status']['max_perf'] == 0):
-        return web.json_response(backend.metrics.last_metrics, status=503)
-    return web.json_response(backend.metrics.last_metrics)
+        return web.json_response(last_metrics, status=503)
+    return web.json_response(last_metrics)
 
 routes = [
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
     web.get("/ping", handle_ping),
-    web.get("/health", handle_health),
+    web.get("/health_error", handle_health_error),
+    web.get("/health_ready", handle_health_ready),
 ]
 
 if __name__ == "__main__":
