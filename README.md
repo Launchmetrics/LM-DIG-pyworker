@@ -1,6 +1,7 @@
 # MPS PyWorker
 
 Vast PyWorker fork to make it provider agnostic.
+Support vast.ai and Northflank
 
 ## Project Structure
 
