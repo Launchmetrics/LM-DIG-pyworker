@@ -156,7 +156,7 @@ routes = [
     web.get("/health_error", handle_health_error),
     # readiness probe return 200 when ready otherwise 503
     web.get("/health_ready", handle_health_ready),
-    # return dowload log history
+    # return download log history
     web.get("/model_log_history", handle_model_log_history),
 ]
 
