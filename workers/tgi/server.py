@@ -112,6 +112,7 @@ async def handle_ping(_):
     """
     return web.json_response(backend.metrics.last_metrics)
 
+
 async def handle_health_error(_):
     """
     Use metrics to return a 503 in case of error_msg
@@ -120,6 +121,7 @@ async def handle_health_error(_):
     if len(last_metrics['error_msg']) > 0:
         return web.json_response(last_metrics, status=503)
     return web.json_response(last_metrics)
+
 
 async def handle_health_ready(_):
     """
@@ -130,12 +132,20 @@ async def handle_health_ready(_):
         return web.json_response(last_metrics, status=503)
     return web.json_response(last_metrics)
 
+
+async def handle_model_log_history(_):
+    """
+    Return model info log history
+    """
+    return web.json_response(backend.model_log_history)
+
 routes = [
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
     web.get("/health", backend.create_handler_healthcheck(ChatHandler())),
     web.get("/ping", handle_ping),
     web.get("/health_error", handle_health_error),
     web.get("/health_ready", handle_health_ready),
+    web.get("/model_log_history", handle_health_ready),
 ]
 
 if __name__ == "__main__":
