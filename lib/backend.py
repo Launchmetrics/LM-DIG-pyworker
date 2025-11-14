@@ -243,6 +243,12 @@ class Backend:
     def backend_errored(self, msg: str) -> None:
         self.metrics._model_errored(msg)
 
+    async def __health_api(
+        self, handler: EndpointHandler[ApiPayload_T]
+    ) -> ClientResponse:
+        log.debug(f"get from endpoint: '{handler.healthcheck_endpoint}'")
+        return await self.session.get(url=handler.healthcheck_endpoint)
+    
     async def __call_api(
         self, handler: EndpointHandler[ApiPayload_T], payload: ApiPayload_T
     ) -> ClientResponse:
