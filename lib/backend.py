@@ -98,8 +98,12 @@ class Backend:
         self,
         handler: EndpointHandler[ApiPayload_T],
     ) -> Callable[[web.Request], Awaitable[Union[web.Response, web.StreamResponse]]]:
+        async def handler_fn(
+            request: web.Request,
+        ) -> Union[web.Response, web.StreamResponse]:
+            return await self.__handle_health_api(handler=handler, request=request)
 
-        return self.__health_api
+        return handler_fn
 
     #######################################Private#######################################
     def _fetch_pubkey(self):
@@ -121,6 +125,15 @@ class Backend:
                 self.backend_errored("Failed to get autoscaler pubkey")
         return key
 
+    async def __handle_health_api(
+        self,
+        handler: EndpointHandler[ApiPayload_T],
+        request: web.Request,
+    ) -> web.Response:
+        """use this function to forward health requests to the model endpoint"""
+        log.debug(f"get from endpoint: '{handler.healthcheck_endpoint}'")
+        return await self.session.get(url=handler.healthcheck_endpoint)
+    
     async def __handle_request(
         self,
         handler: EndpointHandler[ApiPayload_T],
@@ -249,12 +262,6 @@ class Backend:
 
     def backend_errored(self, msg: str) -> None:
         self.metrics._model_errored(msg)
-
-    async def __health_api(
-        self, handler: EndpointHandler[ApiPayload_T]
-    ) -> ClientResponse:
-        log.debug(f"get from endpoint: '{handler.healthcheck_endpoint}'")
-        return await self.session.get(url=handler.healthcheck_endpoint)
     
     async def __call_api(
         self, handler: EndpointHandler[ApiPayload_T], payload: ApiPayload_T
