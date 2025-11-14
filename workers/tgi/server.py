@@ -137,7 +137,9 @@ async def handle_model_log_history(_):
     """
     Return model info log history
     """
-    return web.json_response(backend.model_log_history)
+    return web.json_response(
+        backend.model_log_history[::-1]
+    )
 
 routes = [
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
