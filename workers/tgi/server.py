@@ -142,11 +142,17 @@ async def handle_model_log_history(_):
     )
 
 routes = [
+    # main completions route
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
+    # call tgi /health route
     web.get("/health", backend.create_handler_healthcheck(ChatHandler())),
+    # return backend.metrics.last_metrics
     web.get("/ping", handle_ping),
+    # liveness probe return 503 if any error_msg
     web.get("/health_error", handle_health_error),
+    # readiness probe return 200 when ready otherwise 503
     web.get("/health_ready", handle_health_ready),
+    # return dowload log history
     web.get("/model_log_history", handle_model_log_history),
 ]
 
