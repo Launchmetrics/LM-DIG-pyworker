@@ -94,6 +94,13 @@ class Backend:
 
         return handler_fn
 
+    def create_handler_healthcheck(
+        self,
+        handler: EndpointHandler[ApiPayload_T],
+    ) -> Callable[[web.Request], Awaitable[Union[web.Response, web.StreamResponse]]]:
+
+        return self.__health_api
+
     #######################################Private#######################################
     def _fetch_pubkey(self):
         command = ["curl", "-X", "GET", "https://run.vast.ai/pubkey/"]
