@@ -145,7 +145,7 @@ routes = [
     web.get("/ping", handle_ping),
     web.get("/health_error", handle_health_error),
     web.get("/health_ready", handle_health_ready),
-    web.get("/model_log_history", handle_health_ready),
+    web.get("/model_log_history", handle_model_log_history),
 ]
 
 if __name__ == "__main__":
