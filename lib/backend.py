@@ -143,7 +143,7 @@ class Backend:
         except OSError as e:
             return web.json_response(
                 data={
-                    'err': e.message,
+                    'err': e,
                     'healthcheck_url': handler.healthcheck_endpoint
                 },
                 status=503
