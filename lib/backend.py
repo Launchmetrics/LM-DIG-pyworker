@@ -57,8 +57,11 @@ class Backend:
     msg_history = []
     sem: Semaphore = dataclasses.field(default_factory=Semaphore)
     unsecured: bool = dataclasses.field(
-        default_factory=lambda: bool(strtobool(os.environ.get("UNSECURED", "false"))),
+        default_factory=lambda: bool(
+            strtobool(os.environ.get("UNSECURED", "false"))
+        ),
     )
+    model_log_history = []
 
     def __post_init__(self):
         self.metrics = Metrics()
@@ -76,10 +79,10 @@ class Backend:
     def session(self):
         log.debug(f"starting session with {self.model_server_url}")
         connector = TCPConnector(
-            force_close=True, # Required for long running jobs
+            force_close=True,  # Required for long running jobs
             enable_cleanup_closed=True,
         )
-        
+
         timeout = ClientTimeout(total=None)
         return ClientSession(self.model_server_url, timeout=timeout, connector=connector)
 
@@ -105,7 +108,7 @@ class Backend:
 
         return handler_fn
 
-    #######################################Private#######################################
+    ####################################### Private #######################################
     def _fetch_pubkey(self):
         command = ["curl", "-X", "GET", "https://run.vast.ai/pubkey/"]
         result = subprocess.check_output(command, universal_newlines=True)
@@ -131,7 +134,9 @@ class Backend:
         request: web.Request,
     ) -> web.Response:
         """use this function to forward health requests to the model endpoint"""
-        log.debug(f"__handle_health_api: get from endpoint '{handler.healthcheck_endpoint}'")
+        log.debug(
+            f"__handle_health_api: get from endpoint '{handler.healthcheck_endpoint}'"
+        )
         try:
             resp = await self.session.get(url=handler.healthcheck_endpoint)
             return web.json_response(
@@ -148,7 +153,7 @@ class Backend:
                 },
                 status=503
             )
-    
+
     async def __handle_request(
         self,
         handler: EndpointHandler[ApiPayload_T],
@@ -174,7 +179,7 @@ class Backend:
             response = await self.__call_api(handler=handler, payload=payload)
             status_code = response.status
             log.debug(
-                 " ".join(
+                " ".join(
                     [
                         f"request with reqnum:{auth_data.reqnum}",
                         f"returned status code: {status_code},",
@@ -182,14 +187,20 @@ class Backend:
                 )
             )
             res = await handler.generate_response(request, response)
-            res['req_id'] = payload.req_id # add req_id into response
+            res['req_id'] = payload.req_id  # add req_id into response
             return res
 
         async def make_requests() -> Union[web.Response, web.StreamResponse]:
-            log.debug(f"got batch of {len(batch)} requests, {auth_data.reqnum}")
-            self.metrics._request_start(workload=workload, reqnum=auth_data.reqnum)
+            log.debug(
+                f"got batch of {len(batch)} requests, {auth_data.reqnum}"
+            )
+            self.metrics._request_start(
+                workload=workload, reqnum=auth_data.reqnum
+            )
             if self.allow_parallel_requests is False:
-                log.debug(f"Waiting to aquire Sem for reqnum:{auth_data.reqnum}")
+                log.debug(
+                    f"Waiting to aquire Sem for reqnum:{auth_data.reqnum}"
+                )
                 await self.sem.acquire()
                 log.debug(
                     f"Sem acquired for reqnum:{auth_data.reqnum}, starting request..."
@@ -235,11 +246,11 @@ class Backend:
                 return_when=FIRST_COMPLETED,
             )
             [task.cancel() for task in pending]
-            
+
             results = [task.result() for task in done]
             result = results.pop()
             return web.json_response([res for res in result])
-            
+
         except Exception as e:
             log.debug(f"Exception in main handler loop {e}")
             return web.Response(status=500)
@@ -259,13 +270,17 @@ class Backend:
                     if response.status == 200:
                         log.debug("Healthcheck successful")
                     elif response.status == 503:
-                        log.debug(f"Healthcheck failed with status: {response.status}")
+                        log.debug(
+                            f"Healthcheck failed with status: {response.status}"
+                        )
                         self.backend_errored(
                             f"Healthcheck failed with status: {response.status}"
                         )
                     else:
                         # endpoint not ready yet so bail
-                        log.debug(f"Healthcheck Endpoint not ready: {response.status}")
+                        log.debug(
+                            f"Healthcheck Endpoint not ready: {response.status}"
+                        )
             except Exception as e:
                 log.debug(f"Healthcheck failed with exception: {e}")
                 self.backend_errored(str(e))
@@ -277,13 +292,15 @@ class Backend:
 
     def backend_errored(self, msg: str) -> None:
         self.metrics._model_errored(msg)
-    
+
     async def __call_api(
         self, handler: EndpointHandler[ApiPayload_T], payload: ApiPayload_T
     ) -> ClientResponse:
         api_payload = payload.generate_payload_json()
         req_id = api_payload['req_id']
-        log.debug(f"posting to endpoint: '{handler.endpoint}', req_id: {req_id}")
+        log.debug(
+            f"posting to endpoint: '{handler.endpoint}', req_id: {req_id}"
+        )
         return await self.session.post(url=handler.endpoint, json=api_payload)
 
     def __check_signature(self, auth_data: AuthData) -> bool:
@@ -351,7 +368,10 @@ class Backend:
                     payload = self.benchmark_handler.make_benchmark_payload()
                     total_workload += payload.count_workload()
                     tasks.append(
-                        self.__call_api(handler=self.benchmark_handler, payload=payload)
+                        self.__call_api(
+                            handler=self.benchmark_handler,
+                            payload=payload
+                        )
                     )
 
                 responses = await gather(*tasks)
@@ -413,6 +433,7 @@ class Backend:
                         self.backend_errored(msg)
                         break
                     case LogAction.Info if msg in log_line:
+                        self.model_log_history.append(log_line)
                         log.debug(f"Info from model logs: {log_line}")
 
         async def tail_log():
