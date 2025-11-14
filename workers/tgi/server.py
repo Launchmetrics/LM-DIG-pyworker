@@ -149,7 +149,7 @@ routes = [
     # main completions route
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
     # call tgi /health route
-    web.get("/health", backend.create_handler_healthcheck(ChatHandler())),
+    web.get("/tgi_health", backend.create_handler_healthcheck(ChatHandler())),
     # return backend.metrics.last_metrics
     web.get("/ping", handle_ping),
     # liveness probe return 503 if any error_msg
