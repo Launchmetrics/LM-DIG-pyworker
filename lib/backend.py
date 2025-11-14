@@ -140,10 +140,10 @@ class Backend:
                 },
                 status=resp.status
             )
-        except Exception as e:
+        except ClientConnectorError as e:
             return web.json_response(
                 data={
-                    'err': e,
+                    'err': str(e),
                     'healthcheck_url': handler.healthcheck_endpoint
                 },
                 status=503
