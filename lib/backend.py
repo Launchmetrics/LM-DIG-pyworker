@@ -140,7 +140,7 @@ class Backend:
                 },
                 status=resp.status
             )
-        except OSError as e:
+        except Exception as e:
             return web.json_response(
                 data={
                     'err': e,
