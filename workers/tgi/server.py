@@ -121,10 +121,10 @@ async def handle_health_error(_):
     err_msg = last_metrics['error_msg']
     if len(err_msg) > 0:
         return web.json_response(
-            {'tgi error': err_msg},
+            {'status': 'error', 'tgi error': err_msg},
             status=503
         )
-    return web.json_response({'tgi error': err_msg})
+    return web.json_response({'status': 'ok'})
 
 
 async def handle_health_ready(_):
