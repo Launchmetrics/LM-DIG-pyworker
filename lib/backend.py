@@ -433,7 +433,10 @@ class Backend:
                         self.backend_errored(msg)
                         break
                     case LogAction.Info if msg in log_line:
-                        self.model_log_history.append(log_line)
+                        try:
+                            self.model_log_history.append(json.loads(log_line))
+                        except:
+                            self.model_log_history.append(log_line)
                         log.debug(f"Info from model logs: {log_line}")
 
         async def tail_log():
