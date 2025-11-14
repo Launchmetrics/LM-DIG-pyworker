@@ -132,7 +132,7 @@ class Backend:
     ) -> web.Response:
         """use this function to forward health requests to the model endpoint"""
         log.debug(f"__handle_health_api: get from endpoint '{handler.healthcheck_endpoint}'")
-        return await self.session.get(url=handler.healthcheck_endpoint)
+        return self.session.get(url=handler.healthcheck_endpoint)
     
     async def __handle_request(
         self,
