@@ -132,6 +132,7 @@ async def handle_health_ready(_):
 
 routes = [
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
+    web.get("/health", backend.create_handler_healthcheck(ChatHandler())),
     web.get("/ping", handle_ping),
     web.get("/health_error", handle_health_error),
     web.get("/health_ready", handle_health_ready),
