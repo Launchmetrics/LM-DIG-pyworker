@@ -118,9 +118,13 @@ async def handle_health_error(_):
     Use metrics to return a 503 in case of error_msg
     """
     last_metrics = backend.metrics.last_metrics
-    if len(last_metrics['error_msg']) > 0:
-        return web.json_response(last_metrics, status=503)
-    return web.json_response(last_metrics)
+    err_msg = last_metrics['error_msg']
+    if len(err_msg) > 0:
+        return web.json_response(
+            {'tgi error': err_msg},
+            status=503
+        )
+    return web.json_response({'tgi error': err_msg})
 
 
 async def handle_health_ready(_):
