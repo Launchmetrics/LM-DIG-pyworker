@@ -145,6 +145,14 @@ async def handle_model_log_history(_):
         backend.model_log_history[::-1]
     )
 
+
+async def handle_clear(backend):
+    """
+    Clear pyworker status to handle 24/7 expected behaviour
+    """
+    backend.clear()
+    return web.json_response({'status': 'ok', 'pyworker': 'cleared'})
+
 routes = [
     # main completions route
     web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
@@ -158,6 +166,8 @@ routes = [
     web.get("/health_ready", handle_health_ready),
     # return download log history
     web.get("/model_log_history", handle_model_log_history),
+    # clear some backend properties for 24/7 purpose
+    web.post("/clear_worker", handle_clear(backend)),
 ]
 
 if __name__ == "__main__":
