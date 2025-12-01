@@ -69,7 +69,7 @@ class Backend:
         self._pubkey = self._fetch_pubkey()
         self.__start_healthcheck: bool = False
 
-    async def clear(self):
+    def clear(self):
         self.reqnum = -1  # same as default value
         self.msg_history = []  # same as default value
         return True
