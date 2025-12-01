@@ -172,7 +172,7 @@ routes = [
     # return download log history
     web.get("/model_log_history", handle_model_log_history),
     # clear some backend properties for 24/7 purpose
-    web.get("/clear_worker", handle_clear),
+    web.post("/clear_worker", handle_clear),
 ]
 
 if __name__ == "__main__":
