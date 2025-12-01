@@ -146,12 +146,16 @@ async def handle_model_log_history(_):
     )
 
 
-async def handle_clear(backend):
+async def handle_clear(_):
     """
     Clear pyworker status to handle 24/7 expected behaviour
     """
-    await backend.clear()
-    return web.json_response({'status': 'ok', 'pyworker': 'cleared'})
+    return web.json_response(
+        {
+            'status': 'ok',
+            'clear': backend.clear()
+        }
+    )
 
 
 routes = [
