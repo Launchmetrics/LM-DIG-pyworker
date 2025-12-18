@@ -325,8 +325,8 @@ class Backend:
             log.debug(
                 f"reqnum failure, got {auth_data.reqnum}, current_reqnum: {self.reqnum}"
             )
-            return False
-        elif message in self.msg_history:
+            self.clear()
+        if message in self.msg_history:
             log.debug(f"message: {message} already in message history")
             return False
         elif verify_signature(json.dumps(message, indent=4), auth_data.signature):
