@@ -258,6 +258,8 @@ class Backend:
 
         except Exception as e:
             log.debug(f"Exception in main handler loop {e}")
+            for res in result:
+                log.debug(f"=> {res}")
             return web.Response(status=500)
 
     async def __healthcheck(self):
