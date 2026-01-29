@@ -69,7 +69,7 @@ class ChatHandler(EndpointHandler[InputData]):
                 return {
                     'Error': True,
                     'backend_status_response': model_response.status,
-                    'backend_response': model_response.text()
+                    'backend_response': await model_response.text()
                 }
 
     async def generate_client_response(
