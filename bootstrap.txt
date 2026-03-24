@@ -1,0 +1,49 @@
+*******************vLLM:*******************
+export PORTAL_CONFIG="localhost:18000:18000:/docs:vLLM API|localhost:28265:28265:/:Ray Dashboard";
+export VLLM_MODEL="$MODEL_NAME";
+export RAY_ARGS="--head";
+export USE_ALL_GPUS=true;
+export BACKEND=openai;
+export MODEL_LOG="/var/log/portal/vllm.log";
+export MODEL_SERVER_URL="http://127.0.0.1:18000";
+export MODEL_HEALTH_ENDPOINT="${MODEL_SERVER_URL}/health";
+export HF_TOKEN="${HF_TOKEN:-1}"
+
+entrypoint.sh &
+
+echo "Waiting for initial setup";
+sleep 5;
+
+bootstrap_script=https://raw.githubusercontent.com/vast-ai/pyworker/refs/heads/main/start_server.sh;
+curl -L "$bootstrap_script" | bash;
+
+*******************pro_brand_test*******************
+env >> /etc/environment;
+wget -O - "https://raw.githubusercontent.com/Launchmetrics/LM-DIG-pyworker/$PYWORKER_BRANCH/start_server.sh" | bash && (cd /usr/src && /tgi-entrypoint.sh --max-concurrent-requests 512 --json-output --port 5001 --hostname "0.0.0.0" &>> $MODEL_LOG);
+
+
+**************************************************
+
+VLLM_MODEL
+BACKEND
+MODEL_LOG
+PYWORKER_BRANCH
+
+
+export PORTAL_CONFIG="localhost:18000:18000:/docs:vLLM API|localhost:28265:28265:/:Ray Dashboard";
+export VLLM_MODEL="$MODEL_NAME";
+export RAY_ARGS="--head";
+export USE_ALL_GPUS=true;
+export BACKEND=openai;
+export MODEL_LOG="/var/log/portal/vllm.log";
+export MODEL_SERVER_URL="http://127.0.0.1:18000";
+export MODEL_HEALTH_ENDPOINT="${MODEL_SERVER_URL}/health";
+export HF_TOKEN="${HF_TOKEN:-1}"
+
+entrypoint.sh &
+
+echo "Waiting for initial setup";
+sleep 5;
+
+bootstrap_script=https://raw.githubusercontent.com/vast-ai/pyworker/refs/heads/main/start_server.sh;
+curl -L "$bootstrap_script" | bash;
