@@ -40,7 +40,7 @@ class Metrics:
     # cache last metrics for ping pull
     last_metrics: dict = field(default_factory=lambda: {})
 
-    def _request_start(self, workload: float, reqnum: int) -> None:
+    def _request_start(self, workload: int, reqnum: int) -> None:
         """
         this function is called prior to forwarding a request to a model API.
         """
@@ -50,7 +50,7 @@ class Metrics:
         self.model_metrics.requests_recieved.add(reqnum)
         self.model_metrics.requests_working.add(reqnum)
 
-    def _request_end(self, workload: float, reqnum: int) -> None:
+    def _request_end(self, workload: int, reqnum: int) -> None:
         """
         this function is called after handling of a request ends, regardless of the outcome
         """
