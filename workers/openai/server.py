@@ -90,7 +90,7 @@ backend = Backend(
             (LogAction.ModelLoaded, info_msg)
             for info_msg in MODEL_SERVER_START_LOG_MSG
         ],
-        (LogAction.Info, '"message":"Download'),
+        (LogAction.Info, 'Loading safetensors checkpoint shards'),
         *[
             (LogAction.ModelError, error_msg)
             for error_msg in MODEL_SERVER_ERROR_LOG_MSGS
