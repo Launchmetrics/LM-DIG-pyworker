@@ -1,27 +1,33 @@
 import os
 import logging
-from .data_types.server import CompletionsHandler, ChatCompletionsHandler
-from aiohttp import web
+from typing import Union, Type
+import dataclasses
+
+from aiohttp import web, ClientResponse
+
 from lib.backend import Backend, LogAction
+from lib.data_types import EndpointHandler
 from lib.server import start_server
+from .data_types import InputData
 
-# This line indicates that the inference server is listening
+
+MODEL_SERVER_URL = "http://0.0.0.0:5001"
+
+# This is the last log line that gets emitted once comfyui+extensions have been fully loaded
 MODEL_SERVER_START_LOG_MSG = [
-    "Application startup complete.",  # vLLM
-    "llama runner started",  # Ollama
-    '"message":"Connected","target":"text_generation_router"',  # TGI
-    '"message":"Connected","target":"text_generation_router::server"',  # TGI
+    '"message":"Connected","target":"text_generation_router"',
+    '"message":"Connected","target":"text_generation_router::server"',
+]
+MODEL_SERVER_ERROR_LOG_MSGS = [
+    'Error: ShardFailed',
+    '"message":"shard terminated"',
+    '"message":"Terminating webserver"',
+    '"message":"Shutting down shards"',
+    'Error: WebserverFailed',
+    'Error: DownloadError',
+    'Error: ShardCannotStart',
 ]
 
-MODEL_SERVER_ERROR_LOG_MSGS = [
-    "INFO exited: vllm",  # vLLM
-    "RuntimeError: Engine",  # vLLM
-    "Error: pull model manifest:",  # Ollama
-    "stalled; retrying",  # Ollama
-    "Error: WebserverFailed",  # TGI
-    "Error: DownloadError",  # TGI
-    "Error: ShardCannotStart",  # TGI
-]
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -30,13 +36,66 @@ logging.basicConfig(
 )
 log = logging.getLogger(__file__)
 
+
+@dataclasses.dataclass
+class ChatHandler(EndpointHandler[InputData]):
+
+    @property
+    def endpoint(self) -> str:
+        return "/v1/chat/completions"
+
+    @property
+    def healthcheck_endpoint(self) -> str:
+        return "/health"
+
+    @classmethod
+    def payload_cls(cls) -> Type[InputData]:
+        return InputData
+
+    def make_benchmark_payload(self) -> InputData:
+        return InputData.for_test()
+
+    async def generate_response(
+        self, client_request: web.Request, model_response: ClientResponse
+    ) -> dict:
+        _ = client_request
+        match model_response.status:
+            case 200:
+                log.debug("SUCCESS")
+                data = await model_response.json()
+                return data
+            case code:
+                log.debug("SENDING RESPONSE: ERROR: unknown code")
+                return {
+                    'Error': True,
+                    'backend_status_response': model_response.status,
+                    'backend_response': await model_response.text()
+                }
+
+    async def generate_client_response(
+        self, client_request: web.Request, model_response: ClientResponse
+    ) -> Union[web.Response, web.StreamResponse]:
+        _ = client_request
+        match model_response.status:
+            case 200:
+                log.debug("SUCCESS")
+                data = await model_response.json()
+                return web.json_response(data=data)
+            case code:
+                log.debug("SENDING RESPONSE: ERROR: unknown code")
+                return web.Response(status=code)
+
+
 backend = Backend(
-    model_server_url=os.environ["MODEL_SERVER_URL"],
+    model_server_url=MODEL_SERVER_URL,
     model_log_file=os.environ["MODEL_LOG"],
     allow_parallel_requests=True,
-    benchmark_handler=CompletionsHandler(benchmark_runs=3, benchmark_words=256),
+    benchmark_handler=ChatHandler(benchmark_runs=3, benchmark_words=256),
     log_actions=[
-        *[(LogAction.ModelLoaded, info_msg) for info_msg in MODEL_SERVER_START_LOG_MSG],
+        *[
+            (LogAction.ModelLoaded, info_msg)
+            for info_msg in MODEL_SERVER_START_LOG_MSG
+        ],
         (LogAction.Info, '"message":"Download'),
         *[
             (LogAction.ModelError, error_msg)
@@ -47,13 +106,73 @@ backend = Backend(
 
 
 async def handle_ping(_):
-    return web.Response(body="pong")
+    """
+    Return same metrics sent to autoscaler server
+    According to lib.metrics.__send_metrics_and_reset compute_autoscaler_data
+    """
+    return web.json_response(backend.metrics.last_metrics)
+
+
+async def handle_health_error(_):
+    """
+    Use metrics to return a 503 in case of error_msg
+    """
+    last_metrics = backend.metrics.last_metrics
+    err_msg = last_metrics['error_msg']
+    if len(err_msg) > 0:
+        return web.json_response(
+            {'status': 'error', 'tgi error': err_msg},
+            status=503
+        )
+    return web.json_response({'status': 'ok'})
+
+
+async def handle_health_ready(_):
+    """
+    Use metrics to return a 503 while server is not ready
+    """
+    last_metrics = backend.metrics.last_metrics
+    if last_metrics['max_perf'] == 0:
+        return web.json_response(last_metrics, status=503)
+    return web.json_response(last_metrics)
+
+
+async def handle_model_log_history(_):
+    """
+    Return model info log history
+    """
+    return web.json_response(
+        backend.model_log_history[::-1]
+    )
+
+
+async def handle_clear(_):
+    """
+    Clear pyworker status to handle 24/7 expected behaviour
+    """
+    return web.json_response(
+        {
+            'status': 'ok',
+            'clear': backend.clear()
+        }
+    )
 
 
 routes = [
-    web.post("/v1/completions", backend.create_handler(CompletionsHandler())),
-    web.post("/v1/chat/completions", backend.create_handler(ChatCompletionsHandler())),
+    # main completions route
+    web.post("/v1/chat/completions", backend.create_handler(ChatHandler())),
+    # call tgi /health route
+    web.get("/tgi_health", backend.create_handler_healthcheck(ChatHandler())),
+    # return backend.metrics.last_metrics
     web.get("/ping", handle_ping),
+    # liveness probe return 503 if any error_msg
+    web.get("/health_error", handle_health_error),
+    # readiness probe return 200 when ready otherwise 503
+    web.get("/health_ready", handle_health_ready),
+    # return download log history
+    web.get("/model_log_history", handle_model_log_history),
+    # clear some backend properties for 24/7 purpose
+    web.post("/clear_worker", handle_clear),
 ]
 
 if __name__ == "__main__":
