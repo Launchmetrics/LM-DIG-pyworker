@@ -146,6 +146,6 @@ class Metrics:
         compute_mps_scaler_data()  # update self.last_metrics
 
         self.update_pending = False
-        # self.model_metrics.reset()
-        # self.system_metrics.reset()
+        self.model_metrics.reset()
+        self.system_metrics.reset()
         self.last_metric_update = time.time()
