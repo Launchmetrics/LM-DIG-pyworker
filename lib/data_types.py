@@ -48,7 +48,7 @@ class ApiPayload(ABC):
     @classmethod
     @abstractmethod
     def from_json_msg(
-        cls: Type[ApiPayload_T], json_msg: Dict[str, Any]
+        cls: Type[ApiPayload_T], batch: list[Dict[str, Any]]
     ) -> ApiPayload_T:
         """
         defines how to create an API payload from a JSON message,
