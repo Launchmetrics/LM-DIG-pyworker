@@ -200,13 +200,11 @@ class SystemMetrics:
 class ModelMetrics:
     """Model specific metrics"""
 
-    # these are reset after being sent to autoscaler
     workload_served: float
     workload_received: float
     workload_cancelled: float
     workload_errored: float
-    # these are not
-    workload_pending: float
+    workload_pending: int
     error_msg: Optional[str]
     max_throughput: float
     requests_recieved: Set[int] = field(default_factory=set)
@@ -216,7 +214,7 @@ class ModelMetrics:
     @classmethod
     def empty(cls):
         return cls(
-            workload_pending=0.0,
+            workload_pending=0,
             workload_served=0.0,
             workload_cancelled=0.0,
             workload_errored=0.0,
@@ -246,7 +244,7 @@ class ModelMetrics:
 
 
 @dataclass
-class AutoScalaerData:
+class MPSScalerData:
     """Data that is reported to autoscaler"""
 
     id: str
@@ -257,7 +255,7 @@ class AutoScalaerData:
     cur_perf: float
     cur_capacity: float
     max_capacity: float
-    workload_pending: float
+    workload_pending: int
     num_requests_working: int
     num_requests_recieved: int
     additional_disk_usage: float
