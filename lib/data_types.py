@@ -133,10 +133,10 @@ class EndpointHandler(ABC, Generic[ApiPayload_T]):
     @classmethod
     def get_data_from_request(
         cls, req_data: Dict[str, Any]
-    ) -> Tuple[AuthData, ApiPayload_T]:
+    ) -> Tuple[AuthData, list[ApiPayload_T]]:
         errors = {}
         auth_data: Optional[AuthData] = None
-        payload: Optional[ApiPayload_T] = None
+        payload: Optional[list[ApiPayload_T]] = None
         try:
             if "auth_data" in req_data:
                 auth_data = AuthData.from_json_msg(req_data["auth_data"])
@@ -190,10 +190,8 @@ class SystemMetrics:
         self.last_disk_usage = disk_usage
 
     def reset(self):
-        # autoscaler excepts model_loading_time to be populated only once, when the instance has
-        # finished benchmarking and is ready to receive requests. This applies to restarted instances
-        # as well: they should send model_loading_time once when they are done loading
-        self.model_loading_time = None
+        return
+        # self.model_loading_time = None
 
 
 @dataclass
