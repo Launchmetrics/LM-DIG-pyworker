@@ -1,7 +1,6 @@
 import os
 import json
 import time
-import base64
 import subprocess
 import dataclasses
 import logging
