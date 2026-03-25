@@ -41,7 +41,7 @@ class ApiPayload(ABC):
         pass
 
     @abstractmethod
-    def count_workload(self) -> float:
+    def count_workload(self) -> int:
         """defines how to calculate workload for a payload"""
         pass
 
