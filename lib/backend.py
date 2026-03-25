@@ -432,7 +432,7 @@ class Backend:
                             )
                         except ClientConnectorError as e:
                             log.debug(
-                                f"failed to connect to comfyui api during benchmark"
+                                f"failed to connect to backend api during benchmark"
                             )
                             self.backend_errored(str(e))
                     case LogAction.ModelError if msg in log_line:
