@@ -49,7 +49,7 @@ class ApiPayload(ABC):
     @abstractmethod
     def from_json_msg(
         cls: Type[ApiPayload_T], batch: list[Dict[str, Any]]
-    ) -> ApiPayload_T:
+    ) -> list[ApiPayload_T]:
         """
         defines how to create an API payload from a JSON message,
         it should throw an JsonDataException if there are issues with some fields
