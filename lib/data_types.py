@@ -205,7 +205,8 @@ class ModelMetrics:
     workload_pending: int
     error_msg: Optional[str]
     max_throughput: float
-    requests_recieved: Set[int] = field(default_factory=set)
+    requests_received: int
+    batches_recieved: Set[int] = field(default_factory=set)
     requests_working: Set[int] = field(default_factory=set)
     last_update: float = field(default_factory=time.time)
 
@@ -219,6 +220,7 @@ class ModelMetrics:
             workload_received=0.0,
             error_msg=None,
             max_throughput=0.0,
+            requests_received=0,
         )
 
     @property
@@ -255,7 +257,8 @@ class MPSScalerData:
     max_capacity: float
     workload_pending: int
     num_requests_working: int
-    num_requests_recieved: int
+    num_batches_recieved: int
+    num_requests_received: int
     additional_disk_usage: float
     url: str
 
