@@ -57,14 +57,14 @@ class Metrics:
         self.model_metrics.workload_pending -= workload
         self.model_metrics.requests_working.discard(reqnum)
 
-    def _request_success(self, workload: float) -> None:
+    def _request_success(self, workload: int) -> None:
         """
         this function is called after a response from model API is received and forwarded.
         """
         self.model_metrics.workload_served += workload
         self.update_pending = True
 
-    def _request_errored(self, workload: float) -> None:
+    def _request_errored(self, workload: int) -> None:
         """
         this function is called if model API returns an error
         """
