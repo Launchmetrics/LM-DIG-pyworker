@@ -213,6 +213,7 @@ class Backend:
             )
             # here we're pusing the batch_workoad and a single reqnum
             self.metrics._request_start(
+                num_req=len(batch),  # num of request in batch
                 workload=batch_workload,  # push batch_workload here
                 reqnum=auth_data.reqnum  # push a single reqnum
             )
