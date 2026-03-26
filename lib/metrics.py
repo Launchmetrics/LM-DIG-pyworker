@@ -40,14 +40,15 @@ class Metrics:
     # cache last metrics for ping pull
     last_metrics: dict = field(default_factory=lambda: {})
 
-    def _request_start(self, workload: int, reqnum: int) -> None:
+    def _request_start(self, num_req: int, workload: int, reqnum: int) -> None:
         """
         this function is called prior to forwarding a request to a model API.
         """
         log.debug("request start")
+        self.model_metrics.requests_received += num_req
         self.model_metrics.workload_pending += workload
         self.model_metrics.workload_received += workload
-        self.model_metrics.requests_recieved.add(reqnum)
+        self.model_metrics.batches_recieved.add(reqnum)
         self.model_metrics.requests_working.add(reqnum)
 
     def _request_end(self, workload: int, reqnum: int) -> None:
@@ -118,8 +119,9 @@ class Metrics:
                 num_requests_working=len(
                     self.model_metrics.requests_working
                 ),
-                num_requests_recieved=len(
-                    self.model_metrics.requests_recieved
+                num_requests_received=self.model_metrics.requests_received,
+                num_batches_recieved=len(
+                    self.model_metrics.batches_recieved
                 ),
                 additional_disk_usage=self.system_metrics.additional_disk_usage,
                 cur_capacity=0,
