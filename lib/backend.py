@@ -171,15 +171,17 @@ class Backend:
             return web.json_response(data=e.message, status=422)
         except json.JSONDecodeError:
             return web.json_response(dict(error="invalid JSON"), status=422)
-        workload = sum([payload.count_workload() for payload in batch])
+        batch_workload = sum([payload.count_workload() for payload in batch])
 
         async def cancel_api_call_if_disconnected() -> web.Response:
             await request.wait_for_disconnection()
             log.debug(f"request with reqnum: {auth_data.reqnum} was canceled")
-            self.metrics._request_canceled(workload=workload)
+            self.metrics._request_canceled(workload=batch_workload)
             return web.Response(status=500)
 
         async def make_request(payload):
+            # workload of this single request
+            req_workload = payload.count_workload()
             response = await self.__call_api(handler=handler, payload=payload)
             status_code = response.status
             log.debug(
@@ -190,16 +192,29 @@ class Backend:
                     ]
                 )
             )
+            # please note handler.generate_response() (server)
+            # returns an answer according to the backend model_response.status
             res = await handler.generate_response(request, response)
             res['req_id'] = payload.req_id  # add req_id into response
+            if res.get('Error'):
+                self.metrics._request_errored(workload=req_workload)
+            else:
+                self.metrics._request_success(workload=req_workload)
+
+            self.metrics._request_end(
+                workload=req_workload,  # decrease req_workload only
+                reqnum=auth_data.reqnum,  # even if reqnum was already removed
+            )
             return res
 
-        async def make_requests() -> Union[web.Response, web.StreamResponse]:
+        async def make_requests() -> list:
             log.debug(
                 f"got batch of {len(batch)} requests, {auth_data.reqnum}"
             )
+            # here we're pusing the batch_workoad and a single reqnum
             self.metrics._request_start(
-                workload=workload, reqnum=auth_data.reqnum
+                workload=batch_workload,  # push batch_workload here
+                reqnum=auth_data.reqnum  # push a single reqnum
             )
             if self.allow_parallel_requests is False:
                 log.debug(
@@ -211,32 +226,23 @@ class Backend:
                 )
             else:
                 log.debug(f"Starting request for reqnum:{auth_data.reqnum}")
-            try:
-                ##############################
-                done, _ = await wait(
-                    [
-                        create_task(
-                            make_request(payload=payload)
-                        ) for payload in batch
-                    ],
-                    return_when=ALL_COMPLETED,
-                )
-                #######################
-                results = [res.result() for res in done]
-                self.metrics._request_success(workload=workload)
-                return results
-            except requests.exceptions.RequestException as e:
-                log.debug(f"[backend] Request error: {e}")
-                self.metrics._request_errored(workload=workload)
-                return web.Response(status=500)
-            finally:
-                self.metrics._request_end(
-                    workload=workload,
-                    reqnum=auth_data.reqnum,
-                )
+
+            ##############################
+            done, _ = await wait(
+                [
+                    create_task(
+                        make_request(payload=payload)
+                    ) for payload in batch
+                ],
+                return_when=ALL_COMPLETED,
+            )
+            #######################
+            results = [res.result() for res in done]
+
+            if self.allow_parallel_requests is False:
                 self.sem.release()
 
-        ###########
+            return results
 
         if self.__check_signature(auth_data) is False:
             return web.Response(status=401)
