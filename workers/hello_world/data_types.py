@@ -4,12 +4,10 @@ import inspect
 from typing import Dict, Any
 
 from transformers import OpenAIGPTTokenizer
-import nltk
 
 from lib.data_types import ApiPayload, JsonDataException
 
-nltk.download("words")
-WORD_LIST = nltk.corpus.words.words()
+WORD_LIST = ['some', 'words', 'to', 'add', 'just', 'here']
 
 # used to count to count tokens and workload for LLM
 tokenizer = OpenAIGPTTokenizer.from_pretrained("openai-gpt")
