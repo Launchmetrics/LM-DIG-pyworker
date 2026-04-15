@@ -199,7 +199,6 @@ class ModelMetrics:
     """Model specific metrics"""
 
     workload_served: float
-    workload_received: float
     workload_cancelled: float
     workload_errored: float
     workload_pending: int
@@ -217,7 +216,6 @@ class ModelMetrics:
             workload_served=0.0,
             workload_cancelled=0.0,
             workload_errored=0.0,
-            workload_received=0.0,
             error_msg=None,
             max_throughput=0.0,
             requests_received=0,
@@ -227,17 +225,12 @@ class ModelMetrics:
     def cur_perf(self) -> float:
         return max(self.workload_served / (time.time() - self.last_update), 0.0)
 
-    @property
-    def workload_processing(self) -> float:
-        return max(self.workload_received - self.workload_cancelled, 0.0)
-
     def set_errored(self, error_msg):
         self.reset()
         self.error_msg = error_msg
 
     def reset(self):
         self.workload_served = 0
-        self.workload_received = 0
         self.workload_cancelled = 0
         self.workload_errored = 0
         self.last_update = time.time()

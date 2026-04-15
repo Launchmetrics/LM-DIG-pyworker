@@ -47,7 +47,6 @@ class Metrics:
         log.debug("request start")
         self.model_metrics.requests_received += num_req
         self.model_metrics.workload_pending += workload
-        self.model_metrics.workload_received += workload
         self.model_metrics.batches_recieved.add(reqnum)
         self.model_metrics.requests_working.add(reqnum)
 
@@ -111,7 +110,7 @@ class Metrics:
             mps_scaler_data = MPSScalerData(
                 id=self.id,
                 loadtime=(self.system_metrics.model_loading_time or 0.0),
-                cur_load=(self.model_metrics.workload_processing / elapsed),
+                cur_load=(self.model_metrics.workload_pending / elapsed),
                 max_perf=self.model_metrics.max_throughput,
                 cur_perf=self.model_metrics.cur_perf,
                 error_msg=self.model_metrics.error_msg or "",
