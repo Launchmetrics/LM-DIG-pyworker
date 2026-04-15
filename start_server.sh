@@ -47,6 +47,8 @@ function echo_var(){
 echo "start_server.sh"
 date
 
+echo '*************************************************************'
+echo_var USE_SSL
 echo_var BACKEND
 echo_var WORKER_PORT
 echo_var WORKSPACE_DIR
@@ -56,6 +58,7 @@ echo_var DEBUG_LOG
 echo_var PYWORKER_LOG
 echo_var PYWORKER_BRANCH
 echo_var MODEL_LOG
+echo '*************************************************************'
 
 # Populate /etc/environment with quoted values
 if ! grep -q "VAST" /etc/environment; then
