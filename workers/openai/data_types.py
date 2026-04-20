@@ -28,6 +28,10 @@ class InputData(ApiPayload):
     # https://docs.vllm.ai/en/stable/api/vllm/#vllm.SamplingParams.max_tokens
     max_tokens: Optional[int] = None
 
+    reasoning_effort: Optional[str] = None
+
+    response_format: Optional[dict] = None
+
     # https://docs.vllm.ai/en/stable/api/vllm/#vllm.SamplingParams.temperature
     temperature: Optional[float] = None
 
