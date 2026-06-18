@@ -4,13 +4,22 @@ from lib.data_types import ApiPayload, JsonDataException
 from tasks.brand import bench_messages
 
 
-def no_default_str(cls):  # Decorator for class.
+def no_default_str(cls):
+    # Decorator for class
     def __str__(self):
         """Returns a string containing only the non-default field values."""
-        s = ', '.join(f'{field.name}={getattr(self, field.name)}'
-                      for field in dataclasses.fields(self)
-                      if getattr(self, field.name) != field.default)
-        return f'{type(self).__name__}({s})'
+        name_value = ', '.join(
+            f'{field.name}={getattr(self, field.name)}'
+            for field in dataclasses.fields(self)
+            if getattr(self, field.name) != (
+                field.default
+                if field.default is not dataclasses.MISSING
+                else field.default_factory()
+                if field.default_factory is not dataclasses.MISSING
+                else dataclasses.MISSING
+            )
+        )
+        return f'{type(self).__name__}({name_value})'
 
     setattr(cls, '__str__', __str__)
     return cls
