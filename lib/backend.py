@@ -69,6 +69,9 @@ class Backend:
         self.__start_healthcheck: bool = False
 
     def clear(self):
+        log.debug(
+            'clear history'
+        )
         self.reqnum = -1  # same as default value
         self.msg_history = []  # same as default value
         return True
@@ -329,7 +332,7 @@ class Backend:
             for (key, value) in (dataclasses.asdict(auth_data).items())
             if key != "signature"
         }
-        if auth_data.reqnum < (self.reqnum - MSG_HISTORY_LEN):
+        if auth_data.reqnum < self.reqnum:
             log.debug(
                 f"reqnum failure, got {auth_data.reqnum}, current_reqnum: {self.reqnum}"
             )
