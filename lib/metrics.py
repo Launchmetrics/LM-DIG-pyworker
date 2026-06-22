@@ -64,11 +64,13 @@ class Metrics:
         self.model_metrics.workload_served += workload
         self.update_pending = True
 
-    def _request_errored(self, workload: int) -> None:
+    def _request_errored(self, workload: int, reqnum: int) -> None:
         """
         this function is called if model API returns an error
         """
         self.model_metrics.workload_errored += workload
+        self.model_metrics.workload_pending -= workload
+        self.model_metrics.requests_working.discard(reqnum)
 
     def _request_canceled(self, workload: float) -> None:
         """
