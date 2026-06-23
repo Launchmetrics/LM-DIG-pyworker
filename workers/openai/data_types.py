@@ -70,6 +70,9 @@ class InputData(ApiPayload):
     # https://docs.vllm.ai/en/stable/api/vllm/#vllm.SamplingParams.top_p
     top_p: Optional[float] = None
 
+    # https://docs.vllm.ai/en/stable/api/vllm/#vllm.SamplingParams.min_p
+    min_p: Optional[float] = None
+
     # https://docs.vllm.ai/en/stable/api/vllm/#vllm.SamplingParams.logit_bias
     logit_bias: Optional[dict[int, float]] = None
 
