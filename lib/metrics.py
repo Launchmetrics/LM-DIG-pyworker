@@ -17,7 +17,7 @@ log = logging.getLogger(__file__)
 @cache
 def get_url() -> str:
     use_ssl = os.environ.get("USE_SSL", "false") == "true"
-    worker_port = os.environ['WORKER_PORT']
+    worker_port = os.environ[f"VAST_TCP_PORT_{os.environ['WORKER_PORT']}"]
     public_ip = os.environ["PUBLIC_IPADDR"]
     return f"http{'s' if use_ssl else ''}://{public_ip}:{worker_port}"
 
