@@ -39,7 +39,11 @@ class InputData(ApiPayload):
 
     max_completion_tokens: Optional[int] = None
 
+    # May be used to activate/deactivate thinking mode with some models
     reasoning_effort: Optional[str] = None
+
+    # May be used as well to activate/deactivate thinking mode with some models
+    chat_template_kwargs: Optional[dict] = None
 
     response_format: Optional[dict] = None
 
