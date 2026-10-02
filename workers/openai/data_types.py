@@ -33,6 +33,7 @@ class InputData(ApiPayload):
     messages: list  # mandadatory
 
     req_id: Optional[str] = None
+    model: Optional[str] = None
 
     # https://docs.vllm.ai/en/stable/api/vllm/#vllm.SamplingParams.max_tokens
     max_tokens: Optional[int] = None
