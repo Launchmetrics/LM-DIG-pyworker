@@ -170,6 +170,8 @@ class Backend:
         try:
             data = await request.json()
             auth_data, batch = handler.get_data_from_request(data)
+        except ConnectionResetError as e:
+            return web.json_response(data=str(e), status=422)
         except JsonDataException as e:
             return web.json_response(data=e.message, status=422)
         except json.JSONDecodeError:
