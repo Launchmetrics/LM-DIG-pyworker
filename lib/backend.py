@@ -176,13 +176,13 @@ class Backend:
             return web.json_response(dict(error="invalid JSON"), status=422)
         batch_workload = sum([payload.count_workload() for payload in batch])
 
-        async def cancel_api_call_if_disconnected() -> web.Response:
+        async def cancel_api_call_if_disconnected() -> list:
             await request.wait_for_disconnection()  # still exist in 3.10.1
             log.debug(
                 f"batch request with reqnum: {auth_data.reqnum} was canceled"
             )
             self.metrics._request_canceled(workload=batch_workload)
-            return web.Response(status=500)
+            return []
 
         async def make_request(payload):
             # workload of this single request
@@ -236,7 +236,7 @@ class Backend:
                 log.debug(f"Starting request for reqnum:{auth_data.reqnum}")
 
             ##############################
-            done, _ = await wait(
+            done, pending = await wait(
                 [
                     create_task(
                         make_request(payload=payload)
@@ -245,6 +245,11 @@ class Backend:
                 return_when=ALL_COMPLETED,
             )
             #######################
+            if len(pending) > 0:
+                log.debug(f"Cancel {len(pending)} request(s) to vLLM")
+                [task.cancel() for task in pending]
+                return []
+
             results = [res.result() for res in done]
 
             if self.allow_parallel_requests is False:
