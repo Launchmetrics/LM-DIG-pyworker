@@ -178,7 +178,9 @@ class Backend:
 
         async def cancel_api_call_if_disconnected() -> web.Response:
             await request.wait_for_disconnection()  # still exist in 3.10.1
-            log.debug(f"request with reqnum: {auth_data.reqnum} was canceled")
+            log.debug(
+                f"batch request with reqnum: {auth_data.reqnum} was canceled"
+            )
             self.metrics._request_canceled(workload=batch_workload)
             return web.Response(status=500)
 
