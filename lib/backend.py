@@ -236,7 +236,7 @@ class Backend:
                 log.debug(f"Starting request for reqnum:{auth_data.reqnum}")
 
             ##############################
-            done, pending = await wait(
+            done, _ = await wait(
                 [
                     create_task(
                         make_request(payload=payload)
@@ -245,11 +245,6 @@ class Backend:
                 return_when=ALL_COMPLETED,
             )
             #######################
-            if len(pending) > 0:
-                log.debug(f"Cancel {len(pending)} request(s) to vLLM")
-                [task.cancel() for task in pending]
-                return []
-
             results = [res.result() for res in done]
 
             if self.allow_parallel_requests is False:
