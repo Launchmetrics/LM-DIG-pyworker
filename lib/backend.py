@@ -70,8 +70,9 @@ class Backend:
 
     def clear(self):
         log.debug(
-            'clear history'
+            'clear history and metrics'
         )
+        self.metrics = Metrics()  # clear metrics
         self.reqnum = -1  # same as default value
         self.msg_history = []  # same as default value
         return True
