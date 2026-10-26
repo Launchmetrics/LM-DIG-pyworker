@@ -235,6 +235,17 @@ class ModelMetrics:
         self.workload_errored = 0
         self.last_update = time.time()
 
+    def clear_counters(self):
+        """
+        reset per-run counters (called on /clear_worker only).
+        reset() alone runs every metrics tick, so in-flight counters must not go there.
+        """
+        self.reset()
+        self.workload_pending = 0
+        self.requests_received = 0
+        self.batches_recieved.clear()
+        self.requests_working.clear()
+
 
 @dataclass
 class MPSScalerData:

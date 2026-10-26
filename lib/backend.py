@@ -72,7 +72,7 @@ class Backend:
         log.debug(
             'clear history and metrics'
         )
-        self.metrics = Metrics()  # clear metrics
+        self.metrics.reset()  # reset per-run counters, keep the same Metrics object
         self.reqnum = -1  # same as default value
         self.msg_history = []  # same as default value
         return True

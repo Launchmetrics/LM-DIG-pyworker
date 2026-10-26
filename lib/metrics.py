@@ -100,6 +100,15 @@ class Metrics:
         self.system_metrics.model_is_loaded = True
         self.model_metrics.max_throughput = max_throughput
 
+    def reset(self) -> None:
+        """
+        reset per-run counters on /clear_worker, keeping model loaded state, max_throughput
+        and last_metrics. Do not replace the Metrics object: _send_metrics_loop is bound to it.
+        """
+        self.model_metrics.clear_counters()
+        self.system_metrics.reset()
+        self.update_pending = True  # publish the reset values to /ping on the next loop tick
+
     def _model_errored(self, error_msg: str) -> None:
         self.model_metrics.set_errored(error_msg)
         self.system_metrics.model_is_loaded = True
