@@ -240,6 +240,12 @@ class ModelMetrics:
         reset per-run counters (called on /clear_worker only).
         reset() alone runs every metrics tick, so in-flight counters must not go there.
         """
+        log.info(
+            f"clear_counters called: workload_pending={self.workload_pending} "
+            f"requests_received={self.requests_received} "
+            f"batches_recieved={len(self.batches_recieved)} "
+            f"requests_working={len(self.requests_working)}"
+        )
         self.reset()
         self.workload_pending = 0
         self.requests_received = 0
